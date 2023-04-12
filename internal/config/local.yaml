@@ -1,0 +1,30 @@
+env: local
+server_id: 1
+mysql:
+  host: host.docker.internal
+  port: 3306
+  user: root
+  password: root
+  database: botgpt
+  migration: file://migration/botgpt
+redis:
+  host: host.docker.internal
+  port: 6379
+  db: 0
+  password: ""
+http:
+  port: 8087
+  server_url:  https://eb86-111-252-61-23.jp.ngrok.io/
+log:
+  level: debug
+  json: true
+upload:
+  root_path: upload/
+  limit: 4
+linebot:
+  access_token:
+  secret:
+openai:
+  access_token:
+tg:
+  access_token: 
