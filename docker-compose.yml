@@ -6,9 +6,9 @@ services:
     environment:
       TZ: Asia/Taipei
       NGROK_CONFIG: /etc/ngrok.yml
-    command: start aibot
+    command: start botgpt
     volumes:
-      - ./docker/ngrok/ngrok.yml:/etc/ngrok.yml
+      - ./ngrok.yml:/etc/ngrok.yml
     ports:
       - "4040:4040"
     networks:
@@ -17,16 +17,15 @@ services:
     image: botgpt:${APP_ENV:-local}
     build:
       context: .
-      dockerfile: botgpt/Dockerfile
+      dockerfile: Dockerfile
     restart: on-failure
     ports:
       - "${AIBOT_PORT:-8087}:8087"
     volumes:
-      - ./botgpt/log:/app/log
-      - ./docker/botgpt:/app/config
+      - ./log:/app/log
     environment:
       TARGET: ${APP_ENV:-local}
-      SERVICE: ${SERVICE:-aibot}
+      SERVICE: ${SERVICE:-botgpt}
       APP_VERSION: ${APP_VERSION:-1.0.0}
       TZ: ${TZ:-Asia/Taipei}
       ServerID: ${ServerID:-1}

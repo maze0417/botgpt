@@ -16,6 +16,7 @@ func Init(env string, service string) {
 	config.SetConfigType("yaml")
 	config.SetConfigName(env)
 	config.AddConfigPath(fmt.Sprintf("../docker/%s", service))
+	config.AddConfigPath(fmt.Sprintf("internal/config/%s", service))
 	config.AddConfigPath(fmt.Sprintf("config/%s", service))
 	err = config.ReadInConfig()
 	if err != nil {

@@ -1,8 +1,8 @@
 # build
 FROM golang:alpine as BUILD
 WORKDIR /src
-ADD ./botgpt /src
-ADD ./docker/botgpt /app/config
+ADD ./ /src
+ADD ./internal/config /app/config
 RUN go build -o /app
 
 
@@ -21,6 +21,5 @@ RUN apk update && apk add tzdata ffmpeg
 COPY --from=BUILD ["/app","/app"]
 COPY --from=BUILD ["/app/config", "/app/config"]
 COPY --from=BUILD ["/src/migration", "/app/migration"]
-
 
 ENTRYPOINT /app/botgpt -e ${TARGET} -s ${SERVICE} -v ${APP_VERSION} -i ${ServerID}

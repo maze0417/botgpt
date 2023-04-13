@@ -45,7 +45,7 @@ var (
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&env, "env", "e", "local", "Environment mode (production, uat, development, local)")
-	rootCmd.PersistentFlags().StringVarP(&service, "service", "s", "api", "Service type (api, job)")
+	rootCmd.PersistentFlags().StringVarP(&service, "service", "s", "botgpt", "Service type (api, job)")
 	rootCmd.PersistentFlags().StringVarP(&version, "version", "v", "1.0.0", "Version")
 	rootCmd.PersistentFlags().StringVarP(&serverID, "serverID", "i", "1", "Server ID")
 }
