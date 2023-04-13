@@ -162,12 +162,10 @@ func (h WebHookController) TgMessage(c *gin.Context) {
 	go func() {
 
 		if _, err = h.tgClient.HandleText(update); err != nil {
-			utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle text : %v", err), enum.FALIURE), c)
 			return
 		}
 
 		if _, err = h.tgClient.HandleVoice(update); err != nil {
-			utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle voice : %v", err), enum.FALIURE), c)
 			return
 		}
 	}()
