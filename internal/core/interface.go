@@ -11,6 +11,6 @@ type IAiProvider interface {
 	Transcribe(filePath string) (string, error)
 }
 
-type IAiSender interface {
-	Send(messageFrom string, isGroup bool, userID string, groupID string) (error, *models.AiResponse)
+type IMessageService interface {
+	Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse)
 }

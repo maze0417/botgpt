@@ -37,8 +37,8 @@ const (
 	UseGroupDefaultSysMsg = "你是一個有用AI助手，會嘗試回覆各種問題"
 	//EnTwPrompt            = "請根據以下文本進行翻譯：如果語言是繁體中文，請將其翻譯成英文；如果語言是英文，請將其翻譯成繁體中文。僅需提供翻譯結果，無需其他內容。\\n\\n文本："
 	//JpTwPrompt            = "請根據以下文本進行翻譯：如果語言是繁體中文，請將其翻譯成日文；如果語言是日文，請將其翻譯成繁體中文。僅需提供翻譯結果，無需其他內容。\\n\\n文本："
-	EnTwPrompt = "Translate into other language: If the language is Traditional Chinese, please translate it into English; If the language is English, please translate it into Traditional Chinese.Only print translated result without any additional information .\nExample Q:你幾歲? A:how old are you? \nQ: "
-	JpTwPrompt = "Translate into other language: If the language is Traditional Chinese, please translate it into Japanese; If the language is Japanese, please translate it into Traditional Chinese.Only print translated result without any additional information .\nExample Q:你幾歲? A:あなたの年齢は？ \nQ:"
+	EnTwPrompt = "Translate into other language: If the language is Traditional Chinese, please translate it into English; If the language is English, please translate it into Traditional Chinese.Only print translated result without any additional information."
+	JpTwPrompt = "Translate into other language: If the language is Traditional Chinese, please translate it into Japanese; If the language is Japanese, please translate it into Traditional Chinese.Only print translated result without any additional information."
 )
 
 var PrivateCommand = CommandInfo{

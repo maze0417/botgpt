@@ -15,21 +15,21 @@ import (
 	"strings"
 )
 
-type Gpt3Sender struct {
+type MessageHandler struct {
 	aiProvider core.IAiProvider
 }
 
-func NewGpt3AiSender(apiProvider core.IAiProvider) core.IAiSender {
-	return &Gpt3Sender{
+func NewGpt3AiSender(apiProvider core.IAiProvider) core.IMessageService {
+	return &MessageHandler{
 		aiProvider: apiProvider,
 	}
 }
 
-func (g Gpt3Sender) Send(messageFrom string, isGroup bool, userID string, groupID string) (error, *models.AiResponse) {
+func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
 	log.Printf("send gpt with %v  :: %s \n", userID, messageFrom)
 
-	err, resp := g.SendToGpt(messageFrom, isGroup, userID, groupID)
+	err, resp := g.SendToGpt(messageFrom, isGroup, userID, groupID, replyMessage)
 	if err != nil {
 		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, err)
 		return err, resp
@@ -38,7 +38,7 @@ func (g Gpt3Sender) Send(messageFrom string, isGroup bool, userID string, groupI
 	return err, resp
 }
 
-func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, groupID string) (error, *models.AiResponse) {
+func (g MessageHandler) SendToGpt(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
 	if messageFrom == Help {
 		helpText, _ := HelpCommand.Exec(groupID)
@@ -66,6 +66,10 @@ func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, g
 		isImage = true
 	default:
 
+	}
+
+	if len(replyMessage) > 0 && !isCommand {
+		appendMessage(messageFrom, replyMessage)
 	}
 
 	if !isImage && !isCommand {
@@ -238,4 +242,14 @@ func insertSystemMessage(sysMsg string, totalMessages []gpt3.Message) []gpt3.Mes
 	copy(arrCopy[1:], totalMessages[:])
 	totalMessages = arrCopy
 	return totalMessages
+}
+func appendMessage(message string, append string) string {
+	var builder strings.Builder
+	builder.WriteString(message)
+	builder.WriteRune('\n')
+
+	builder.WriteString(append)
+	builder.WriteRune('\n')
+
+	return builder.String()
 }

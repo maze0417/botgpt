@@ -21,7 +21,7 @@ func (v MockAiProvider) GenerateText(totalMessages []gpt3.Message, userID string
 
 func TestGetSetMessages(t *testing.T) {
 	const maxUserMessageLen = 3
-	config.InitTest()
+	config.InitTest("gptbot")
 
 	rdb := redis.GetSingleRdb()
 	ctx := context.Background()

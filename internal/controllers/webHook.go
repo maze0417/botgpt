@@ -21,10 +21,10 @@ import (
 
 type WebHookController struct {
 	tgClient *telegram.TelegramClient
-	aiSender core.IAiSender
+	aiSender core.IMessageService
 }
 
-func NewWebHookController(tgClient *telegram.TelegramClient, aiSender core.IAiSender) *WebHookController {
+func NewWebHookController(tgClient *telegram.TelegramClient, aiSender core.IMessageService) *WebHookController {
 	return &WebHookController{
 		tgClient: tgClient,
 		aiSender: aiSender,
@@ -53,7 +53,7 @@ func (h WebHookController) ClientMessage(c *gin.Context) {
 	redisKey := fmt.Sprintf("%s:%s", userID, sendMessage)
 
 	resp, err := redisManager.GetAndCache(redisKey, func() (interface{}, error) {
-		resp, err := h.aiSender.Send(sendMessage, false, userID, groupID)
+		resp, err := h.aiSender.Send(sendMessage, false, userID, groupID, "")
 		return err, resp
 	})
 
@@ -108,7 +108,7 @@ func (h WebHookController) LineMessage(c *gin.Context) {
 					groupID = event.Source.GroupID
 				}
 
-				err, gptRes := h.aiSender.Send(message.Text, isGroup, userID, groupID)
+				err, gptRes := h.aiSender.Send(message.Text, isGroup, userID, groupID, "")
 
 				switch err := err.(type) {
 				case nil:

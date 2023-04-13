@@ -25,10 +25,10 @@ var (
 
 type TelegramClient struct {
 	aiProvider core.IAiProvider
-	aiSender   core.IAiSender
+	aiSender   core.IMessageService
 }
 
-func NewTelegramClient(aiProvider core.IAiProvider, aiSender core.IAiSender) *TelegramClient {
+func NewTelegramClient(aiProvider core.IAiProvider, aiSender core.IMessageService) *TelegramClient {
 	return &TelegramClient{
 		aiProvider: aiProvider,
 		aiSender:   aiSender,
@@ -108,6 +108,10 @@ func (t TelegramClient) HandleText(update tgbotapi.Update) (*models.AiResponse, 
 	}
 
 	isReply := message.ReplyToMessage != nil
+	var messageReply string
+	if isReply {
+		messageReply = message.ReplyToMessage.Text
+	}
 
 	var messageFrom string
 
@@ -119,16 +123,12 @@ func (t TelegramClient) HandleText(update tgbotapi.Update) (*models.AiResponse, 
 		messageFrom = update.Message.Caption
 	}
 
-	if isReply {
-		messageFrom = appendMessage(messageFrom, message.ReplyToMessage.Text)
-	}
-
 	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
 	groupID := fmt.Sprintf("%v", update.Message.Chat.ID)
 
 	_ = SendBotAction(update.Message.Chat.ID, tgbotapi.ChatTyping)
 
-	err, gptResponse := t.aiSender.Send(messageFrom, update.Message.Chat.IsGroup(), userID, groupID)
+	err, gptResponse := t.aiSender.Send(messageFrom, update.Message.Chat.IsGroup(), userID, groupID, messageReply)
 
 	switch err := err.(type) {
 	case nil:
@@ -231,7 +231,7 @@ func (t TelegramClient) HandleVoice(update tgbotapi.Update) (*models.AiResponse,
 
 	_ = UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
 
-	err, gptResponse := t.aiSender.Send(text, false, userID, groupID)
+	err, gptResponse := t.aiSender.Send(text, false, userID, groupID, "")
 	builder.WriteString("\n\nGPT：\n")
 	switch err := err.(type) {
 	case nil:
@@ -253,17 +253,6 @@ func (t TelegramClient) HandleVoice(update tgbotapi.Update) (*models.AiResponse,
 		return nil, err
 	}
 
-}
-
-func appendMessage(message string, append string) string {
-	var builder strings.Builder
-	builder.WriteString(message)
-	builder.WriteRune('\n')
-
-	builder.WriteString(append)
-	builder.WriteRune('\n')
-
-	return builder.String()
 }
 
 //
