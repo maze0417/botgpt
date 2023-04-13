@@ -2,8 +2,7 @@ package migration
 
 import (
 	"botgpt/internal/config"
-	"botgpt/internal/repository"
-
+	"botgpt/pkg/mysql"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 
@@ -25,12 +24,12 @@ func (m *MigrateLogger) Verbose() bool {
 
 func Migrate() {
 
-	repository.CreateDbIfNotExist()
+	mysql.CreateDbIfNotExist()
 
 	c := config.GetConfig()
 	migrationFile := c.GetString("mysql.migration")
 
-	migrateDsn := fmt.Sprintf("mysql://%s", repository.GetMysqlDsn())
+	migrateDsn := fmt.Sprintf("mysql://%s", mysql.GetMysqlDsn())
 
 	log.Printf("migrate used %v %v", migrationFile, migrateDsn)
 	m, err := migrate.New(

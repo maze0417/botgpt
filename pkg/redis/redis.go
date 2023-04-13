@@ -1,11 +1,11 @@
-package repository
+package redis
 
 import (
 	"botgpt/internal/config"
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	redis "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 var testAddr string
@@ -16,6 +16,7 @@ func GetSingleRdb() *redis.Client {
 	redisOnce.Do(func() {
 		rdb = CreateRdbConnection()
 	})
+
 	return rdb
 }
 

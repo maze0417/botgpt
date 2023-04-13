@@ -1,7 +1,7 @@
 package redisManager
 
 import (
-	"botgpt/internal/repository"
+	"botgpt/pkg/redis"
 	"context"
 	"encoding/json"
 )
@@ -12,7 +12,7 @@ const expiredTime = 0
 func GetAndCache(redisKey string, getFunc func() (interface{}, error)) (interface{}, error) {
 	// 檢查 Redis 上是否存在資料
 
-	rdb := repository.GetSingleRdb()
+	rdb := redis.GetSingleRdb()
 	ctx := context.Background()
 	data, err := rdb.Get(ctx, redisKey).Result()
 

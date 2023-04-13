@@ -5,8 +5,8 @@ import (
 	"botgpt/internal/core"
 	"botgpt/internal/enum"
 	"botgpt/internal/models"
-	"botgpt/internal/repository"
 	"botgpt/internal/utils"
+	"botgpt/pkg/redis"
 
 	"context"
 	"encoding/json"
@@ -169,7 +169,7 @@ func getSetUserHistory(userID string, msg gpt3.Message, maxUserMessageLen int) (
 		return err, nil
 	}
 
-	rdb := repository.GetSingleRdb()
+	rdb := redis.GetSingleRdb()
 
 	ctx := context.Background()
 
@@ -199,7 +199,7 @@ func getSetUserHistory(userID string, msg gpt3.Message, maxUserMessageLen int) (
 
 func getUserHistory(userID string) (error, []gpt3.Message) {
 
-	rdb := repository.GetSingleRdb()
+	rdb := redis.GetSingleRdb()
 
 	ctx := context.Background()
 

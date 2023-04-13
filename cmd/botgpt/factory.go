@@ -9,7 +9,7 @@ import (
 var statusController *controllers.StatusController
 var webHookController *controllers.WebHookController
 
-func registerFactory() {
+func RegisterFactory() {
 
 	var aiProvider = ai.NewGpt3AiProvider()
 

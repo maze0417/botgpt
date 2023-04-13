@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"botgpt/internal/config"
 	"botgpt/internal/enum"
 	"fmt"
 	"github.com/sirupsen/logrus"
@@ -33,9 +34,9 @@ func (hook *CustomFieldHook) Fire(entry *logrus.Entry) error {
 	level := entry.Level
 
 	if logType == nil {
-		logger.Filename = fmt.Sprintf("log/%v.%v.log", StatusInfo.Component, level)
+		logger.Filename = fmt.Sprintf("log/%v.%v.log", config.Service, level)
 
-		entry.Data["type"] = StatusInfo.Component
+		entry.Data["type"] = config.Service
 		//c := entry.Context.(*gin.Context)
 		//entry.Data["requestId"] = c.MustGet("requestId")
 

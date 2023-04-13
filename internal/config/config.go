@@ -10,7 +10,19 @@ import (
 
 var config *viper.Viper
 
-func Init(env string, service string) {
+var (
+	Env      string
+	Service  string
+	Version  string
+	ServerID string
+)
+
+func Init(env string, service string, version string, serverID string) {
+	Env = env
+	Service = service
+	Version = version
+	ServerID = serverID
+
 	var err error
 	config = viper.New()
 	config.SetConfigType("yaml")
@@ -26,14 +38,14 @@ func Init(env string, service string) {
 
 }
 
-func InitTest() {
+func InitTest(service string) {
 	var err error
 	config = viper.New()
 	config.SetConfigType("yaml")
 	config.SetConfigName("test")
-	config.AddConfigPath("../../docker/sms_server/aibot")
-	config.AddConfigPath("../../../docker/sms_server/aibot")
-	config.AddConfigPath("config/")
+	config.AddConfigPath(fmt.Sprintf("../docker/%s", service))
+	config.AddConfigPath(fmt.Sprintf("internal/config/%s", "botgpt"))
+	config.AddConfigPath(fmt.Sprintf("config/%s", "botgpt"))
 	err = config.ReadInConfig()
 	if err != nil {
 		log.Fatal("error on parsing configuration file")

@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     restart: on-failure
     ports:
-      - "${AIBOT_PORT:-8087}:8087"
+      - "${BOTGPT_PORT:-8087}:8087"
     volumes:
       - ./log:/app/log
     environment:

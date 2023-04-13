@@ -3,7 +3,7 @@ package ai
 import (
 	"botgpt/internal/clients/gpt3"
 	"botgpt/internal/config"
-	"botgpt/internal/repository"
+	"botgpt/pkg/redis"
 	"context"
 	"testing"
 )
@@ -23,7 +23,7 @@ func TestGetSetMessages(t *testing.T) {
 	const maxUserMessageLen = 3
 	config.InitTest()
 
-	rdb := repository.GetSingleRdb()
+	rdb := redis.GetSingleRdb()
 	ctx := context.Background()
 
 	userID := "test-user"

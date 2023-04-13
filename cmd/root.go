@@ -3,12 +3,18 @@ package cmd
 import (
 	"botgpt/cmd/botgpt"
 	"botgpt/internal/config"
-	"botgpt/internal/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	env      string
+	service  string
+	version  string
+	serverID string
 )
 
 var rootCmd = &cobra.Command{
@@ -20,28 +26,16 @@ var rootCmd = &cobra.Command{
 
 		gin.SetMode(gin.ReleaseMode)
 
-		utils.SetStatusInfo(&utils.Status{
-			Version:   version,
-			Env:       env,
-			Component: service,
-			ServerID:  serverID,
-		})
 		switch service {
 		case "botgpt":
-			config.Init(env, service)
+			botgpt.RegisterFactory()
+			config.Init(env, service, version, serverID)
 			botgpt.Run()
 		default:
 			panic("no match service : " + service)
 		}
 	},
 }
-
-var (
-	env      string
-	service  string
-	version  string
-	serverID string
-)
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&env, "env", "e", "local", "Environment mode (production, uat, development, local)")

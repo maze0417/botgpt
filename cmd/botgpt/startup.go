@@ -14,7 +14,7 @@ func Run() {
 	migration.Migrate()
 
 	env := config.GetConfig()
-	registerFactory()
+
 	r := NewRouter() //router
 	port := fmt.Sprintf("0.0.0.0:%v", env.GetString("http.port"))
 

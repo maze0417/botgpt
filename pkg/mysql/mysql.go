@@ -1,4 +1,4 @@
-package repository
+package mysql
 
 import (
 	"botgpt/internal/config"
@@ -16,18 +16,20 @@ var (
 	db   *gorm.DB
 )
 
-func GetMysqlDB() *gorm.DB {
+func GetMysqlDB() (*gorm.DB, error) {
+	var errs error
 	once.Do(func() {
 		dsn := GetMysqlDsn()
 		var err error
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 
 		if err != nil {
+			errs = err
 			log.Errorf("Error connecting to database : error=%v", err)
 		}
 
 	})
-	return db
+	return db, errs
 }
 
 func GetMysqlDsn() string {
