@@ -11,7 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"log"
 	"strings"
 )
 
@@ -26,7 +26,16 @@ func NewGpt3AiSender(apiProvider core.IAiProvider) core.IAiSender {
 }
 
 func (g Gpt3Sender) Send(messageFrom string, isGroup bool, userID string, groupID string) (error, *models.AiResponse) {
-	return g.SendToGpt(messageFrom, isGroup, userID, groupID)
+
+	log.Printf("send gpt with %v  :: %s \n", userID, messageFrom)
+
+	err, resp := g.SendToGpt(messageFrom, isGroup, userID, groupID)
+	if err != nil {
+		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, resp.Text)
+		return err, resp
+	}
+	log.Printf("reply %v  message :: %s  \n \n ", userID, resp.Text)
+	return err, resp
 }
 
 func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, groupID string) (error, *models.AiResponse) {
@@ -50,7 +59,7 @@ func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, g
 	case Private:
 		if isGroup {
 			errMsg := fmt.Sprintf("empty Command and IsGroup , just return ")
-			fmt.Println(errMsg)
+			log.Println(errMsg)
 			return utils.NewKnownError(enum.FALIURE, errMsg), nil
 		}
 	case ImageBot:
@@ -82,7 +91,6 @@ func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, g
 		if err != nil {
 			return err, nil
 		}
-		log.Printf("send image with %v \n", message)
 
 		return nil, &models.AiResponse{
 			IsImage:     true,
@@ -124,7 +132,7 @@ func (g Gpt3Sender) SendToGpt(messageFrom string, isGroup bool, userID string, g
 		_, _ = getSetTotalMessages(userID, msg, 1)
 
 	}
-	log.Printf("reply %v text message :: %s  \n \n ", userID, resp)
+
 	replyToClientMsg := resp
 
 	if err != nil {
@@ -221,44 +229,6 @@ func getUserHistory(userID string) (error, []gpt3.Message) {
 	return nil, messageResult
 }
 
-//	func getAssistMessages(userID string) (error, gpt3.Message) {
-//		var msg gpt3.Message
-//		rdb := connection.GetSingleRdb()
-//
-//		ctx := context.Background()
-//
-//		assistKey := fmt.Sprintf("%s:assistant", userID)
-//
-//		lastMessage, err := rdb.Get(ctx, assistKey).Result()
-//
-//		if err != nil {
-//			return err, msg
-//		}
-//
-//		err = json.Unmarshal([]byte(lastMessage), &msg)
-//		if err != nil {
-//			return fmt.Errorf("json unmarshal error: %w", err), msg
-//		}
-//		return nil, msg
-//	}
-//
-// func setAssistMessages(userID string, msg gpt3.Message) error {
-//
-//		b, err := json.Marshal(msg)
-//		if err != nil {
-//			return err
-//		}
-//
-//		value := string(b)
-//		rdb := connection.GetSingleRdb()
-//
-//		ctx := context.Background()
-//		assistKey := fmt.Sprintf("%s:assistant", userID)
-//
-//		err = rdb.Set(ctx, assistKey, value, 0).Err()
-//
-//		return err
-//	}
 func insertSystemMessage(sysMsg string, totalMessages []gpt3.Message) []gpt3.Message {
 	arrCopy := make([]gpt3.Message, len(totalMessages)+1)
 	arrCopy[0] = gpt3.Message{

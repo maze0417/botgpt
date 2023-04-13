@@ -159,18 +159,20 @@ func (h WebHookController) TgMessage(c *gin.Context) {
 		utils.SendResponse(http.StatusOK, response.OKHasContent("no update.message"), c)
 		return
 	}
-	var aiRes *models.AiResponse
-	if aiRes, err = h.tgClient.HandleText(update); err != nil {
-		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle text : %v", err), enum.FALIURE), c)
-		return
-	}
+	go func() {
 
-	if aiRes, err = h.tgClient.HandleVoice(update); err != nil {
-		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle voice : %v", err), enum.FALIURE), c)
-		return
-	}
+		if _, err = h.tgClient.HandleText(update); err != nil {
+			utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle text : %v", err), enum.FALIURE), c)
+			return
+		}
 
-	utils.SendResponse(http.StatusOK, response.OKHasContent(aiRes), c)
+		if _, err = h.tgClient.HandleVoice(update); err != nil {
+			utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error handle voice : %v", err), enum.FALIURE), c)
+			return
+		}
+	}()
+
+	utils.SendResponse(http.StatusOK, response.OKHasContent("received Message"), c)
 }
 
 func (h WebHookController) UpdatePrompt(c *gin.Context) {
