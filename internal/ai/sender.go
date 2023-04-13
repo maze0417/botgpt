@@ -31,7 +31,7 @@ func (g Gpt3Sender) Send(messageFrom string, isGroup bool, userID string, groupI
 
 	err, resp := g.SendToGpt(messageFrom, isGroup, userID, groupID)
 	if err != nil {
-		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, resp.Text)
+		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, err)
 		return err, resp
 	}
 	log.Printf("reply %v  message :: %s  \n \n ", userID, resp.Text)
