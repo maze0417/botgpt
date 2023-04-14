@@ -1,4 +1,4 @@
-package ai
+package handler
 
 import (
 	"botgpt/internal/clients/gpt3"

@@ -1,9 +1,10 @@
-package ai
+package handler
 
 import (
+	"botgpt/internal/ai"
 	"botgpt/internal/clients/gpt3"
-	"botgpt/internal/core"
 	"botgpt/internal/enum"
+	"botgpt/internal/interfaces"
 	"botgpt/internal/models"
 	"botgpt/internal/utils"
 	"botgpt/pkg/redis"
@@ -16,10 +17,10 @@ import (
 )
 
 type MessageHandler struct {
-	aiProvider core.IAiProvider
+	aiProvider interfaces.IAiProvider
 }
 
-func NewGpt3AiSender(apiProvider core.IAiProvider) core.IMessageService {
+func NewMessageHandler(apiProvider interfaces.IAiProvider) interfaces.IMessageHandler {
 	return &MessageHandler{
 		aiProvider: apiProvider,
 	}
@@ -27,42 +28,29 @@ func NewGpt3AiSender(apiProvider core.IAiProvider) core.IMessageService {
 
 func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
-	log.Printf("send gpt with %v  :: %s \n", userID, messageFrom)
-
-	err, resp := g.SendToGpt(messageFrom, isGroup, userID, groupID, replyMessage)
-	if err != nil {
-		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, err)
-		return err, resp
-	}
-	log.Printf("reply %v  message :: %s  \n \n ", userID, resp.Text)
-	return err, resp
-}
-
-func (g MessageHandler) SendToGpt(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
-
-	if messageFrom == Help {
-		helpText, _ := HelpCommand.Exec(groupID)
+	if messageFrom == ai.Help {
+		helpText, _ := ai.HelpCommand.Exec(groupID)
 		return nil, &models.AiResponse{
 			IsImage:     false,
 			IsText:      true,
 			Text:        helpText,
 			TgParseMode: "",
-			CommandMode: HelpCommand.Usage,
+			CommandMode: ai.HelpCommand.Usage,
 		}
 	}
 
-	command := GetCommandInfoByMessage(messageFrom, groupID)
+	command := ai.GetCommandInfoByMessage(messageFrom, groupID)
 
 	isImage := false
 	isCommand := strings.HasPrefix(messageFrom, "/")
 	switch command.Cmd {
-	case Private:
+	case ai.Private:
 		if isGroup {
 			errMsg := fmt.Sprintf("empty Command and IsGroup , just return ")
 			log.Println(errMsg)
 			return utils.NewKnownError(enum.FALIURE, errMsg), nil
 		}
-	case ImageBot:
+	case ai.ImageBot:
 		isImage = true
 	default:
 
@@ -76,7 +64,7 @@ func (g MessageHandler) SendToGpt(messageFrom string, isGroup bool, userID strin
 		isImage = strings.Contains(messageFrom, "draw") ||
 			strings.Contains(messageFrom, "畫")
 	}
-	message := ReplaceCommandAsEmpty(messageFrom)
+	message := ai.ReplaceCommandAsEmpty(messageFrom)
 
 	if isCommand && len(message) <= 1 {
 		return nil, &models.AiResponse{
@@ -90,7 +78,7 @@ func (g MessageHandler) SendToGpt(messageFrom string, isGroup bool, userID strin
 
 	if isImage {
 
-		result, err := g.aiProvider.GenerateImage(message)
+		result, err := g.aiProvider.GenerateImage(message, userID)
 
 		if err != nil {
 			return err, nil

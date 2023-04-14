@@ -2,7 +2,7 @@ package ai
 
 import (
 	"botgpt/internal/clients/gpt3"
-	"botgpt/internal/core"
+	"botgpt/internal/interfaces"
 	"botgpt/internal/utils"
 
 	"log"
@@ -15,7 +15,7 @@ func (a OpenAiProvider) Transcribe(filePath string) (string, error) {
 	return gpt3.Transcribe(filePath)
 }
 
-func NewGpt3AiProvider() core.IAiProvider {
+func NewOpenAiProvider() interfaces.IAiProvider {
 	return &OpenAiProvider{}
 }
 func (a OpenAiProvider) GenerateImage(message string, userID string) (string, error) {

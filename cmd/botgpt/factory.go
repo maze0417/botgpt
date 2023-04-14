@@ -4,6 +4,7 @@ import (
 	"botgpt/internal/ai"
 	"botgpt/internal/controllers"
 	"botgpt/internal/handler"
+	"botgpt/internal/services"
 )
 
 var statusController *controllers.StatusController
@@ -11,11 +12,15 @@ var webHookController *controllers.WebHookController
 
 func RegisterFactory() {
 
-	var aiProvider = ai.NewGpt3AiProvider()
+	var aiProvider = ai.NewOpenAiProvider()
 
-	var telegramMessageHandler = handler.NewTelegramMessageHandler(aiProvider)
+	var messageHandler = handler.NewMessageHandler(aiProvider)
+
+	var appService = services.NewAppService(aiProvider, messageHandler)
+	var lineService = services.NewLineService(aiProvider, messageHandler)
+	var telegramService = services.NewTelegramService(aiProvider, messageHandler)
 
 	statusController = controllers.NewStatusController()
-	webHookController = controllers.NewWebHookController(telegramMessageHandler)
+	webHookController = controllers.NewWebHookController(telegramService, lineService, appService)
 
 }

@@ -1,4 +1,4 @@
-package core
+package interfaces
 
 import (
 	"botgpt/internal/clients/gpt3"
@@ -12,6 +12,10 @@ type IAiProvider interface {
 }
 
 type IMessageHandler interface {
-	HandleText(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse)
-	HandleVoice(fileID string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse)
+	Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse)
+}
+
+type IMessageService interface {
+	HandleIfText(input interface{})
+	HandleIFVoice(input interface{})
 }
