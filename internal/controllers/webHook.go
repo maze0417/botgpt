@@ -3,7 +3,6 @@ package controllers
 import (
 	"botgpt/internal/ai"
 	"botgpt/internal/clients/line"
-	"botgpt/internal/clients/telegram"
 	"botgpt/internal/core"
 	"botgpt/internal/enum"
 	"botgpt/internal/models"
@@ -20,14 +19,12 @@ import (
 )
 
 type WebHookController struct {
-	tgClient *telegram.TelegramClient
-	aiSender core.IMessageService
+	telegramHandler core.IMessageHandler
 }
 
-func NewWebHookController(tgClient *telegram.TelegramClient, aiSender core.IMessageService) *WebHookController {
+func NewWebHookController(telegramHandler core.IMessageHandler) *WebHookController {
 	return &WebHookController{
-		tgClient: tgClient,
-		aiSender: aiSender,
+		telegramHandler: telegramHandler,
 	}
 }
 
@@ -53,7 +50,7 @@ func (h WebHookController) ClientMessage(c *gin.Context) {
 	redisKey := fmt.Sprintf("%s:%s", userID, sendMessage)
 
 	resp, err := redisManager.GetAndCache(redisKey, func() (interface{}, error) {
-		resp, err := h.aiSender.Send(sendMessage, false, userID, groupID, "")
+		resp, err := h.telegramHandler.HandleText(sendMessage, false, userID, groupID, "")
 		return err, resp
 	})
 
@@ -108,7 +105,7 @@ func (h WebHookController) LineMessage(c *gin.Context) {
 					groupID = event.Source.GroupID
 				}
 
-				err, gptRes := h.aiSender.Send(message.Text, isGroup, userID, groupID, "")
+				err, gptRes := h.telegramHandler.HandleText(message.Text, isGroup, userID, groupID, "")
 
 				switch err := err.(type) {
 				case nil:
@@ -159,16 +156,35 @@ func (h WebHookController) TgMessage(c *gin.Context) {
 		utils.SendResponse(http.StatusOK, response.OKHasContent("no update.message"), c)
 		return
 	}
-	go func() {
 
-		if _, err = h.tgClient.HandleText(update); err != nil {
-			return
-		}
+	message := update.Message
 
-		if _, err = h.tgClient.HandleVoice(update); err != nil {
-			return
-		}
-	}()
+	if message == nil || len(message.Text) == 0 {
+		return nil, nil
+	}
+
+	isReply := message.ReplyToMessage != nil
+	var messageReply string
+	if isReply {
+		messageReply = message.ReplyToMessage.Text
+	}
+
+	var messageFrom string
+
+	if len(update.Message.Text) > 0 {
+		messageFrom = message.Text
+	}
+
+	if len(update.Message.Caption) > 0 {
+		messageFrom = update.Message.Caption
+	}
+
+	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
+	groupID := fmt.Sprintf("%v", update.Message.Chat.ID)
+
+	_, _ = h.telegramHandler.HandleText(messageFrom, update.Message.Chat.IsGroup(), userID, groupID, messageReply)
+
+	_, _ = h.telegramHandler.HandleVoice()
 
 	utils.SendResponse(http.StatusOK, response.OKHasContent("received Message"), c)
 }
