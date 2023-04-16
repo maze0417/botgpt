@@ -1,13 +1,16 @@
 package services
 
 import (
+	"botgpt/internal/clients/aws"
 	"botgpt/internal/clients/telegram"
 	"botgpt/internal/interfaces"
 	"botgpt/internal/models"
 	"botgpt/internal/utils"
 	"botgpt/pkg/ffmpeg"
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/polly"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -117,7 +120,8 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
 
 	inputOggName := fmt.Sprintf("v%s-%d.ogg", groupID, update.Message.MessageID)
-	outputMp3Name := fmt.Sprintf("v%s-%d.mp3", groupID, update.Message.MessageID)
+	format := polly.OutputFormatMp3
+	outputName := fmt.Sprintf("v%s-%d.%s", groupID, update.Message.MessageID, format)
 	fileID := update.Message.Voice.FileID
 
 	// retrieve the file using the Telegram file API
@@ -144,7 +148,7 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 	defer func() {
 		_ = voiceFile.Close()
 		_ = os.Remove(inputOggName)
-		_ = os.Remove(outputMp3Name)
+		_ = os.Remove(outputName)
 	}()
 
 	_, err = io.Copy(voiceFile, voiceResponse.Body)
@@ -153,9 +157,9 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 		return nil, err
 	}
 
-	fmt.Printf("Voice message downloaded to %s successfully , try  to convert mp3 %s \n", voiceFile.Name(), outputMp3Name)
+	fmt.Printf("Voice message downloaded to %s successfully , try  to convert mp3 %s \n", voiceFile.Name(), outputName)
 
-	err = ffmpeg.ConvertOggToMp3(inputOggName, outputMp3Name)
+	err = ffmpeg.ConvertOggToMp3(inputOggName, outputName)
 	if err != nil {
 		fmt.Println("ffmpeg Error converting OGG to MP3:", err)
 		return nil, err
@@ -166,7 +170,7 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 	startPrompt := "語音辨識中(Processing your audio) ..."
 	resMessage, _ := telegram.ReplayToChat(message.Chat.ID, startPrompt, "", update.Message.MessageID)
 
-	text, err := t.aiProvider.Transcribe(outputMp3Name)
+	text, err := t.aiProvider.Transcribe(outputName)
 	if err != nil {
 		return nil, err
 	}
@@ -178,11 +182,29 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 
 	err, gptResponse := t.messageHandler.Send(text, false, userID, groupID, "")
 	builder.WriteString("\n\nGPT：\n")
+
 	switch err := err.(type) {
 	case nil:
 		// no error occurred, continue with your logic
 		builder.WriteString(gptResponse.Text)
 		_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
+
+		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), outputName)
+
+		err = aws.SynthesizeSpeech(gptResponse.Text, outputFile, format)
+		if err != nil {
+			builder.WriteString(err.Error())
+			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
+
+			return nil, err
+		}
+		err = telegram.SendVoice(outputFile)
+		if err != nil {
+			builder.WriteString(err.Error())
+			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
+
+			return nil, err
+		}
 
 		return gptResponse, nil
 	case *utils.KnownError:

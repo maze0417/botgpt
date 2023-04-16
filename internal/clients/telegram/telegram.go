@@ -2,9 +2,12 @@ package telegram
 
 import (
 	"botgpt/internal/config"
+	"botgpt/pkg/ffmpeg"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	log "github.com/sirupsen/logrus"
+	"io"
+	"os"
 	"strings"
 	"sync"
 )
@@ -81,27 +84,36 @@ func SendBotAction(chatID int64, action string) error {
 	return nil
 }
 
-//
-//func sendVoice() {
-//
-//	// Send the converted MP3 file back
-//	mp3File, err := os.Open("output.mp3")
-//	if err != nil {
-//		fmt.Println("Error opening MP3 file:", err)
-//		continue
-//	}
-//	defer mp3File.Close()
-//
-//	audioConfig := tgbotapi.NewAudioUpload(update.Message.Chat.ID, mp3File)
-//	audioConfig.Title = "Converted Voice Message"
-//	audioConfig.MimeType = "audio/mpeg"
-//	audioConfig.FileID = "output.mp3"
-//
-//	_, err = bot.Send(audioConfig)
-//	if err != nil {
-//		fmt.Println("Error sending MP3 file:", err)
-//	}
-//}
+func SendVoice(voicePath string) error {
+
+	outputFile := strings.ReplaceAll(voicePath, ".mp3", ".ogg")
+
+	err := ffmpeg.ConvertMp3ToOgg(voicePath, outputFile)
+	if err != nil {
+		return err
+	}
+
+	voice, err := os.Open(outputFile)
+	if err != nil {
+		return err
+	}
+	defer func(mp3File *os.File) {
+		_ = mp3File.Close()
+		_ = os.Remove(voicePath)
+		_ = os.Remove(outputFile)
+	}(voice)
+	data, err := io.ReadAll(voice)
+
+	audioConfig := tgbotapi.NewVoiceUpload(1066396636, tgbotapi.FileBytes{Name: voice.Name(),
+		Bytes: data})
+
+	_, err = CreateOrGetTgClient().Send(audioConfig)
+	if err != nil {
+		fmt.Println("Error sending voice file:", err)
+		return err
+	}
+	return nil
+}
 
 func UpdateMessage(chatID int64, msg string, editMessageID int) error {
 
