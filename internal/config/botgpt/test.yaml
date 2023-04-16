@@ -21,9 +21,9 @@ upload:
   root_path: upload/
   limit: 4
 linebot:
-  access_token: mVroF0Mam2KlRFOUnys+VgpCZCpph8OwaUhSQR9f/uVzpyFZJ9FzvP9fRx+q1RldT6uMZIfwsgQLBEFeyGc21jfYlIQc+d3KzgsUp6EW4grmUfR88SPiG/kA0/GKHuXF/CcDdEqxoeSlOdDGGmxkiQdB04t89/1O/w1cDnyilFU=
-  secret: 158441c735b63ca1ff1ee467f3c75b42
+  access_token:
+  secret:
 openai:
-  access_token: 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
+  access_token:
 tg:
-  access_token: 5726591950:AAHnhhL4DLqkBJ7OsS05xuTKVZQeqHDJtgg
+  access_token:
