@@ -23,6 +23,7 @@ services:
       - "${BOTGPT_PORT:-8087}:8087"
     volumes:
       - ./log:/app/log
+      - /app/upload #create folder only
     environment:
       TARGET: ${APP_ENV:-local}
       SERVICE: ${SERVICE:-botgpt}

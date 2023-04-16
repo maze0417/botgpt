@@ -119,9 +119,9 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 	groupID := fmt.Sprintf("%v", update.Message.Chat.ID)
 	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
 
-	inputOggName := fmt.Sprintf("v%s-%d.ogg", groupID, update.Message.MessageID)
+	inputOggName := fmt.Sprintf("%s%s-%d.ogg", utils.GetUploadDir(), groupID, update.Message.MessageID)
 	format := polly.OutputFormatMp3
-	outputName := fmt.Sprintf("v%s-%d.%s", groupID, update.Message.MessageID, format)
+	outputName := fmt.Sprintf("%s%s-%d.%s", utils.GetUploadDir(), groupID, update.Message.MessageID, format)
 	fileID := update.Message.Voice.FileID
 
 	// retrieve the file using the Telegram file API
@@ -157,11 +157,11 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 		return nil, err
 	}
 
-	fmt.Printf("Voice message downloaded to %s successfully , try  to convert mp3 %s \n", voiceFile.Name(), outputName)
+	log.Printf("Voice message downloaded to %s successfully , try  to convert mp3 %s \n", voiceFile.Name(), outputName)
 
 	err = ffmpeg.ConvertOggToMp3(inputOggName, outputName)
 	if err != nil {
-		fmt.Println("ffmpeg Error converting OGG to MP3:", err)
+		log.Println("ffmpeg Error converting OGG to MP3:", err)
 		return nil, err
 	}
 
@@ -187,14 +187,17 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 	case nil:
 		// no error occurred, continue with your logic
 		builder.WriteString(gptResponse.Text)
+
 		_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
 
-		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), outputName)
+		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), format)
+		log.Printf("try convert text to voice %s \n", outputFile)
 
 		err = aws.SynthesizeSpeech(gptResponse.Text, outputFile, format)
 		if err != nil {
 			builder.WriteString(err.Error())
 			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
+			log.Error(err)
 
 			return nil, err
 		}
@@ -202,7 +205,7 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 		if err != nil {
 			builder.WriteString(err.Error())
 			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
-
+			log.Error(err)
 			return nil, err
 		}
 

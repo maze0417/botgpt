@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -15,6 +16,11 @@ const FileTimeFormat = "2006-01-02"
 
 func GetUploadDir() string {
 	c := config.GetConfig()
+
+	if runtime.GOOS == "linux" {
+
+		return c.GetString("upload.root_path")
+	}
 	rootPath := fmt.Sprintf("%s%s", config.GetProjectDir(), c.GetString("upload.root_path"))
 	now := time.Now()
 	strTime := strings.Split(now.Format(FileTimeFormat), "-")
