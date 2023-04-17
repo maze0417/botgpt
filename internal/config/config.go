@@ -49,7 +49,7 @@ func InitTest(service string) {
 	config.SetConfigType("yaml")
 	config.SetConfigName("test")
 	path := GetProjectDir()
-
+	config.AddConfigPath(fmt.Sprintf("../../../../docker/%s", service))
 	config.AddConfigPath(fmt.Sprintf("%sinternal/config/%s", path, service))
 	config.AddConfigPath(fmt.Sprintf("config/%s", service))
 	err = config.ReadInConfig()

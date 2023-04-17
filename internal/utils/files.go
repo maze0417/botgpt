@@ -3,13 +3,11 @@ package utils
 import (
 	"botgpt/internal/config"
 	"fmt"
+	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 const FileTimeFormat = "2006-01-02"
@@ -22,24 +20,14 @@ func GetUploadDir() string {
 		return c.GetString("upload.root_path")
 	}
 	rootPath := fmt.Sprintf("%s%s", config.GetProjectDir(), c.GetString("upload.root_path"))
-	now := time.Now()
-	strTime := strings.Split(now.Format(FileTimeFormat), "-")
-	year := strTime[0]
-	month := strTime[1]
-	day := strTime[2]
-	MakeDir(rootPath)
-	MakeDir(rootPath + year)
-	MakeDir(rootPath + year + "/" + month)
-	MakeDir(rootPath + year + "/" + month + "/" + day)
-	path, _ := filepath.Abs(rootPath + year + "/" + month + "/" + day)
 
 	if err := os.Mkdir(rootPath, 0755); os.IsExist(err) {
 		// triggers if dir already exists
-		return path + "/"
+		return rootPath + "/"
 	}
 	_ = os.Mkdir(rootPath, 0777)
 
-	return path + "/"
+	return rootPath + "/"
 }
 
 func GetNewFilePath(ext string) (string, string) {

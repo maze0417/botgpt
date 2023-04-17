@@ -1,6 +1,10 @@
 package aws
 
 import (
+	"botgpt/internal/enum"
+	"errors"
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"sync"
@@ -12,6 +16,12 @@ import (
 
 var pollyClient *polly.Polly
 var once sync.Once
+
+var LangMap = map[string]string{
+	enum.JaJP:  "Mizuki",
+	enum.EnUS:  "Joanna",
+	enum.CmnCN: "Zhiyu",
+}
 
 func getPollyClient() *polly.Polly {
 	once.Do(func() {
@@ -29,14 +39,29 @@ func getPollyClient() *polly.Polly {
 
 	return pollyClient
 }
-func SynthesizeSpeech(text string, outputFile string, outputFormat string) error {
+func SynthesizeSpeech(text string, outputFile string, outputFormat string, lang string) error {
 	client := getPollyClient()
 
+	actor, ok := LangMap[lang]
+
+	if !ok {
+		err := fmt.Sprintf("No speech lang info for %s \n", lang)
+		log.Printf(err)
+		return errors.New(err)
+	}
+
+	log.Printf("Send to Polly Actor is %s for %s \n", actor, lang)
 	// Synthesize speech using AWS Polly
 	input := &polly.SynthesizeSpeechInput{
-		OutputFormat: aws.String(outputFormat),
-		Text:         aws.String(text),
-		VoiceId:      aws.String("Joanna"), // Replace "Joanna" with the desired voice
+		Engine:          nil,
+		LanguageCode:    aws.String(lang),
+		LexiconNames:    nil,
+		OutputFormat:    aws.String(outputFormat),
+		SampleRate:      nil,
+		SpeechMarkTypes: nil,
+		Text:            aws.String(text),
+		TextType:        nil,
+		VoiceId:         aws.String(actor), // Replace "Joanna" with the desired voice
 	}
 
 	output, err := client.SynthesizeSpeech(input)

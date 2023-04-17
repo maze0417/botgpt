@@ -17,6 +17,8 @@ const (
 	System    = "system" // 目前system作用較小
 	User      = "user"
 	Assistant = "assistant"
+	gpt3      = "gpt-3.5-turbo"
+	gpt4      = "gpt-4"
 )
 
 func createGp3Client() *openai.Client {
@@ -33,7 +35,7 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 	ctx := context.Background()
 
 	resp, err := createGp3Client().CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model:            "gpt-3.5-turbo",
+		Model:            gpt4,
 		Messages:         convertToChatCompletionMessages(totalMessages),
 		MaxTokens:        512,
 		PresencePenalty:  0,

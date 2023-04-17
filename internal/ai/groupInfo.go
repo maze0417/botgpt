@@ -1,12 +1,12 @@
 package ai
 
 type GroupSetting struct {
-	DefaultCommandMode string
-	Enable             bool
+	CommandMode string
+	Enable      bool
 }
 
 const (
-	Default                = "你是一個有用AI助手，會嘗試回覆各種問題"
+	DefaultMode            = "chat"
 	LineGroupGpt3Turbo     = "Cede0b311a552b14f418db2e1acfd88de"
 	TelegramGroupGpt3Turbo = "-910957863"
 	PrivateTestBot         = "1066396636"
@@ -15,20 +15,20 @@ const (
 
 var GroupMapping = map[string]GroupSetting{
 	PrivateTestBot: {
-		DefaultCommandMode: Private,
-		Enable:             false,
+		CommandMode: Private,
+		Enable:      false,
 	},
 	LineGroupGpt3Turbo: {
-		DefaultCommandMode: LineBot,
-		Enable:             false,
+		CommandMode: LineBot,
+		Enable:      false,
 	},
 	TelegramGroupGpt3Turbo: {
-		DefaultCommandMode: TgBot,
-		Enable:             false,
+		CommandMode: TgBot,
+		Enable:      false,
 	},
 	PhTgProject: {
-		DefaultCommandMode: EnToTw,
-		Enable:             true,
+		CommandMode: EnToTw,
+		Enable:      true,
 	},
 }
 
@@ -61,7 +61,7 @@ func SetGroupMode(groupID string, cmd string) *GroupSetting {
 		return nil
 	}
 
-	v.DefaultCommandMode = cmdInfo.Cmd
+	v.CommandMode = cmdInfo.Cmd
 	if v.Enable {
 		v.Enable = false
 	}

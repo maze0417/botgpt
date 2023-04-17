@@ -74,7 +74,7 @@ var CommandMap = map[string]CommandInfo{
 		System:        JpTwPrompt,
 		Exec:          trimPrefixIfNeeded,
 		TgParserMode:  "",
-		Usage:         JpToTw + " jp to tw",
+		Usage:         "ja-JP",
 		MaxHistoryLen: 0,
 		//PromptPrefix:  JpTwPrompt,
 	},
@@ -84,7 +84,7 @@ var CommandMap = map[string]CommandInfo{
 		System:        EnTwPrompt,
 		Exec:          trimPrefixIfNeeded,
 		TgParserMode:  tgbotapi.ModeHTML,
-		Usage:         "/entw@mazeaibot en to tw",
+		Usage:         "en-US",
 		MaxHistoryLen: 0,
 		//PromptPrefix:  EnTwPrompt,
 	},
@@ -93,7 +93,7 @@ var CommandMap = map[string]CommandInfo{
 		System:        UseGroupDefaultSysMsg,
 		Exec:          nil,
 		TgParserMode:  tgbotapi.ModeHTML,
-		Usage:         "@botimg {message}",
+		Usage:         "generate image by dall-e",
 		MaxHistoryLen: 0,
 	},
 	LineBot: {
@@ -148,7 +148,7 @@ func GetCommandInfoByMessage(message string, groupID string) CommandInfo {
 
 	groupMode := GetGroupMode(groupID)
 	if groupMode != nil {
-		message = groupMode.DefaultCommandMode
+		message = groupMode.CommandMode
 	}
 
 	// Find the index position of the first space
@@ -218,6 +218,19 @@ func showHelp(fromID string) (string, error) {
 
 	var builder strings.Builder
 
+	builder.WriteString(fmt.Sprintf("Your Group or User ID: %s \n", fromID))
+	builder.WriteRune('\n')
+
+	mode := DefaultMode
+	group := GetGroupMode(fromID)
+	if group != nil {
+
+		mode = group.CommandMode
+	}
+
+	builder.WriteString(fmt.Sprintf("Mode: %s \n", mode))
+	builder.WriteRune('\n')
+
 	for cmd, info := range CommandMap {
 
 		if strings.HasPrefix(cmd, "/") {
@@ -226,9 +239,8 @@ func showHelp(fromID string) (string, error) {
 		}
 
 	}
-	output := fmt.Sprintf("Your Group or User ID is %s \nAvailable command:\n%s", fromID, builder.String())
 
-	return output, nil
+	return builder.String(), nil
 }
 func GetCommandBy(cmd string) *CommandInfo {
 

@@ -8,7 +8,6 @@ import (
 	"botgpt/internal/models"
 	"botgpt/internal/utils"
 	"botgpt/pkg/redis"
-
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,15 +27,9 @@ func NewMessageHandler(apiProvider interfaces.IAiProvider) interfaces.IMessageHa
 
 func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
-	if messageFrom == ai.Help {
-		helpText, _ := ai.HelpCommand.Exec(groupID)
-		return nil, &models.AiResponse{
-			IsImage:     false,
-			IsText:      true,
-			Text:        helpText,
-			TgParseMode: "",
-			CommandMode: ai.HelpCommand.Usage,
-		}
+	err, response, setCommand := getOrSetGroupMode(messageFrom, groupID)
+	if setCommand {
+		return err, response
 	}
 
 	command := ai.GetCommandInfoByMessage(messageFrom, groupID)
@@ -97,7 +90,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		Role:    gpt3.User,
 		Content: fmt.Sprintf("%v: %v", command.PromptPrefix, message),
 	}
-	err, totalMessages := getSetTotalMessages(userID, msg, command.MaxHistoryLen)
+	err, totalMessages = getSetTotalMessages(userID, msg, command.MaxHistoryLen)
 	if err != nil {
 		totalMessages = append(totalMessages, msg)
 	}
@@ -146,6 +139,38 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		TgParseMode: command.TgParserMode,
 		CommandMode: command.Usage,
 	}
+}
+
+func getOrSetGroupMode(messageFrom string, groupID string) (error, *models.AiResponse, bool) {
+	if messageFrom == ai.Help {
+		helpText, _ := ai.HelpCommand.Exec(groupID)
+		return nil, &models.AiResponse{
+			IsImage:     false,
+			IsText:      true,
+			Text:        helpText,
+			TgParseMode: "",
+			CommandMode: ai.HelpCommand.Usage,
+		}, true
+	}
+
+	for cmd, cmdInfo := range ai.CommandMap {
+		if messageFrom == cmd {
+			resp := ai.SetGroupMode(groupID, cmd)
+
+			if resp == nil {
+				continue
+			}
+			return nil, &models.AiResponse{
+				IsImage:     false,
+				IsText:      true,
+				Text:        "mode changed to " + cmd,
+				TgParseMode: "",
+				CommandMode: cmdInfo.Usage,
+			}, true
+		}
+	}
+
+	return nil, nil, false
 }
 
 func getSetTotalMessages(userID string, msg gpt3.Message, maxUserMessageLen int) (error, []gpt3.Message) {
