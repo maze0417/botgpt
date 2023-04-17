@@ -84,7 +84,7 @@ func SendBotAction(chatID int64, action string) error {
 	return nil
 }
 
-func SendVoice(voicePath string) error {
+func SendVoice(chatID int64, voicePath string) error {
 
 	outputFile := strings.ReplaceAll(voicePath, ".mp3", ".ogg")
 
@@ -104,7 +104,7 @@ func SendVoice(voicePath string) error {
 	}(voice)
 	data, err := io.ReadAll(voice)
 
-	audioConfig := tgbotapi.NewVoiceUpload(1066396636, tgbotapi.FileBytes{Name: voice.Name(),
+	audioConfig := tgbotapi.NewVoiceUpload(chatID, tgbotapi.FileBytes{Name: voice.Name(),
 		Bytes: data})
 
 	_, err = CreateOrGetTgClient().Send(audioConfig)

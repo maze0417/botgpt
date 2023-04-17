@@ -36,7 +36,7 @@ func TestTextToSpeech(t *testing.T) {
 
 			fmt.Println("Synthesized speech saved to", outputFile)
 
-			err = telegram.SendVoice(outputFile)
+			err = telegram.SendVoice(1066396636, outputFile)
 			if err != nil {
 				t.Error(err)
 			}

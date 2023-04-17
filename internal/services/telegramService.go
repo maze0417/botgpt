@@ -201,7 +201,7 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 
 			return nil, err
 		}
-		err = telegram.SendVoice(outputFile)
+		err = telegram.SendVoice(message.Chat.ID, outputFile)
 		if err != nil {
 			builder.WriteString(err.Error())
 			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)
