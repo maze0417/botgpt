@@ -66,6 +66,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 			Text:        command.Usage,
 			TgParseMode: command.TgParserMode,
 			CommandMode: command.Usage,
+			Lang:        command.Lang,
 		}
 	}
 
@@ -83,6 +84,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 			Text:        result,
 			TgParseMode: command.TgParserMode,
 			CommandMode: command.Usage,
+			Lang:        command.Lang,
 		}
 	}
 	var totalMessages []gpt3.Message
@@ -138,6 +140,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		Text:        replyToClientMsg,
 		TgParseMode: command.TgParserMode,
 		CommandMode: command.Usage,
+		Lang:        command.Lang,
 	}
 }
 
@@ -150,6 +153,7 @@ func getOrSetGroupMode(messageFrom string, groupID string) (error, *models.AiRes
 			Text:        helpText,
 			TgParseMode: "",
 			CommandMode: ai.HelpCommand.Usage,
+			Lang:        ai.HelpCommand.Lang,
 		}, true
 	}
 
@@ -166,6 +170,7 @@ func getOrSetGroupMode(messageFrom string, groupID string) (error, *models.AiRes
 				Text:        "mode changed to " + cmd,
 				TgParseMode: "",
 				CommandMode: cmdInfo.Usage,
+				Lang:        cmdInfo.Lang,
 			}, true
 		}
 	}

@@ -193,7 +193,7 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), format)
 		log.Printf("try convert text to voice %s \n", outputFile)
 
-		err = aws.SynthesizeSpeech(gptResponse.Text, outputFile, format, gptResponse.CommandMode)
+		err = aws.SynthesizeSpeech(gptResponse.Text, outputFile, format, gptResponse.Lang)
 		if err != nil {
 			builder.WriteString(err.Error())
 			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)

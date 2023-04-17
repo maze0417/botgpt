@@ -3,6 +3,7 @@ package ai
 import (
 	"botgpt/internal/clients/azure"
 	"botgpt/internal/clients/telegram"
+	"botgpt/internal/enum"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,7 +18,8 @@ type CommandInfo struct {
 	Usage         string                       `json:"usage"`
 	TgParserMode  string                       `json:"tg_parser_mode"`
 	Exec          func(string) (string, error) `json:"-"`
-	MaxHistoryLen int                          `json:"max_history_len"`
+	MaxHistoryLen int                          `json:"max _history_len"`
+	Lang          string                       `json:"-"`
 }
 
 const (
@@ -74,9 +76,9 @@ var CommandMap = map[string]CommandInfo{
 		System:        JpTwPrompt,
 		Exec:          trimPrefixIfNeeded,
 		TgParserMode:  "",
-		Usage:         "ja-JP",
+		Usage:         "/jptw@mazeaibot translate to ja-JP",
 		MaxHistoryLen: 0,
-		//PromptPrefix:  JpTwPrompt,
+		Lang:          enum.JaJP,
 	},
 	EnToTw: {
 		Cmd: EnToTw,
@@ -84,16 +86,16 @@ var CommandMap = map[string]CommandInfo{
 		System:        EnTwPrompt,
 		Exec:          trimPrefixIfNeeded,
 		TgParserMode:  tgbotapi.ModeHTML,
-		Usage:         "en-US",
+		Usage:         "/entw@mazeaibot translate to en-US",
 		MaxHistoryLen: 0,
-		//PromptPrefix:  EnTwPrompt,
+		Lang:          enum.EnUS,
 	},
 	ImageBot: {
 		Cmd:           ImageBot,
 		System:        UseGroupDefaultSysMsg,
 		Exec:          nil,
 		TgParserMode:  tgbotapi.ModeHTML,
-		Usage:         "generate image by dall-e",
+		Usage:         "@botimg generate image by dall-e",
 		MaxHistoryLen: 0,
 	},
 	LineBot: {

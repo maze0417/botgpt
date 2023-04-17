@@ -35,7 +35,7 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 	ctx := context.Background()
 
 	resp, err := createGp3Client().CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model:            gpt4,
+		Model:            gpt3,
 		Messages:         convertToChatCompletionMessages(totalMessages),
 		MaxTokens:        512,
 		PresencePenalty:  0,

@@ -6,4 +6,5 @@ type AiResponse struct {
 	Text        string `json:"text,omitempty"`
 	TgParseMode string `json:"tg_parse_mode,omitempty"`
 	CommandMode string `json:"command_mode,omitempty"`
+	Lang        string `json:"lang,omitempty"`
 }

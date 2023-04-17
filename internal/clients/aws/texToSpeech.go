@@ -2,8 +2,6 @@ package aws
 
 import (
 	"botgpt/internal/enum"
-	"errors"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -45,9 +43,11 @@ func SynthesizeSpeech(text string, outputFile string, outputFormat string, lang 
 	actor, ok := LangMap[lang]
 
 	if !ok {
-		err := fmt.Sprintf("No speech lang info for %s \n", lang)
-		log.Printf(err)
-		return errors.New(err)
+		//err := fmt.Sprintf("No speech lang info for %s \n", lang)
+		//log.Printf(err)
+		//return errors.New(err)
+		lang = enum.CmnCN
+		actor = LangMap[enum.CmnCN]
 	}
 
 	log.Printf("Send to Polly Actor is %s for %s \n", actor, lang)
