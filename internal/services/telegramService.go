@@ -1,7 +1,6 @@
 package services
 
 import (
-	"botgpt/internal/clients/aws"
 	"botgpt/internal/clients/telegram"
 	"botgpt/internal/interfaces"
 	"botgpt/internal/models"
@@ -21,12 +20,16 @@ import (
 type TelegramService struct {
 	aiProvider     interfaces.IAiProvider
 	messageHandler interfaces.IMessageHandler
+	textToSpeech   interfaces.ITextToSpeech
 }
 
-func NewTelegramService(aiProvider interfaces.IAiProvider, aiSender interfaces.IMessageHandler) *TelegramService {
+func NewTelegramService(aiProvider interfaces.IAiProvider,
+	messageHandler interfaces.IMessageHandler,
+	textToSpeech interfaces.ITextToSpeech) *TelegramService {
 	return &TelegramService{
 		aiProvider:     aiProvider,
-		messageHandler: aiSender,
+		messageHandler: messageHandler,
+		textToSpeech:   textToSpeech,
 	}
 }
 func (t TelegramService) HandleIfText(input interface{}) {
@@ -193,7 +196,12 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), format)
 		log.Printf("try convert text to voice %s \n", outputFile)
 
-		err = aws.SynthesizeSpeech(gptResponse.Text, outputFile, format, gptResponse.Lang)
+		lang := t.textToSpeech.GetLangFromText(gptResponse.Text)
+		if len(lang) == 0 {
+
+			lang = gptResponse.Text
+		}
+		err = t.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, format, lang)
 		if err != nil {
 			builder.WriteString(err.Error())
 			_ = telegram.UpdateMessage(message.Chat.ID, builder.String(), resMessage.MessageID)

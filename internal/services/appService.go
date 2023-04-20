@@ -78,6 +78,7 @@ func (l AppService) HandleText(message *models.Message) {
 }
 
 func (l AppService) HandleVoice(message models.Message) {
+	// 下載語音檔案
 
 }
 

@@ -2,6 +2,7 @@ package botgpt
 
 import (
 	"botgpt/internal/ai"
+	"botgpt/internal/clients/aws"
 	"botgpt/internal/controllers"
 	"botgpt/internal/handler"
 	"botgpt/internal/services"
@@ -16,9 +17,11 @@ func RegisterFactory() {
 
 	var messageHandler = handler.NewMessageHandler(aiProvider)
 
+	var textToSpeech = aws.NewPolly()
+
 	var appService = services.NewAppService(aiProvider, messageHandler)
 	var lineService = services.NewLineService(aiProvider, messageHandler)
-	var telegramService = services.NewTelegramService(aiProvider, messageHandler)
+	var telegramService = services.NewTelegramService(aiProvider, messageHandler, textToSpeech)
 
 	statusController = controllers.NewStatusController()
 	webHookController = controllers.NewWebHookController(telegramService, lineService, appService)

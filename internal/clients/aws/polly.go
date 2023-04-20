@@ -2,6 +2,8 @@ package aws
 
 import (
 	"botgpt/internal/enum"
+	"botgpt/internal/interfaces"
+	"github.com/pemistahl/lingua-go"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -21,6 +23,35 @@ var LangMap = map[string]string{
 	enum.CmnCN: "Zhiyu",
 }
 
+type Polly struct {
+}
+
+func NewPolly() interfaces.ITextToSpeech {
+	return &Polly{}
+}
+
+func (p Polly) GetLangFromText(text string) string {
+	detector := lingua.NewLanguageDetectorBuilder().
+		FromAllLanguages().
+		Build()
+
+	language, exists := detector.DetectLanguageOf(text)
+
+	if !exists {
+		return ""
+	}
+
+	lang, ok := enum.LangMap[language.String()]
+	if !ok {
+		return language.String()
+	}
+	return lang
+}
+
+func (p Polly) TextToSpeech(text string, outputFile string, outputFormat string, lang string) error {
+	return textToSpeech(text, outputFile, outputFormat, lang)
+}
+
 func getPollyClient() *polly.Polly {
 	once.Do(func() {
 		// Create a new session with the default AWS configuration
@@ -37,7 +68,7 @@ func getPollyClient() *polly.Polly {
 
 	return pollyClient
 }
-func SynthesizeSpeech(text string, outputFile string, outputFormat string, lang string) error {
+func textToSpeech(text string, outputFile string, outputFormat string, lang string) error {
 	client := getPollyClient()
 
 	actor, ok := LangMap[lang]
