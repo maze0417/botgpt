@@ -4,6 +4,7 @@ import (
 	"botgpt/internal/clients/azure"
 	"botgpt/internal/clients/telegram"
 	"botgpt/internal/enum"
+	"botgpt/internal/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,19 +21,19 @@ type CommandInfo struct {
 	Exec          func(string) (string, error) `json:"-"`
 	MaxHistoryLen int                          `json:"max _history_len"`
 	Lang          string                       `json:"-"`
+	Alias         []string                     `json:"alias"`
 }
 
 const (
-	Private             = ""
-	ImageBot            = "@botimg"
-	LineBot             = "@bot"
+	ChatWithoutTag      = "/chatnotag"
+	Chat                = "/chat"
+	Image               = "/image"
 	CreateAzureWorkItem = "/cw@mazeaibot"
 	TranslateToEnglish  = "/en@mazeaibot"
 	ChildrenTalker      = "/ct@mazeaibot"
-	TgBot               = "@mazeaibot"
 	EnToTw              = "/entw@mazeaibot"
 	JpToTw              = "/jptw@mazeaibot"
-	Help                = "/help"
+	Help                = "/help@mazeaibot"
 )
 
 const (
@@ -43,31 +44,21 @@ const (
 	JpTwPrompt = "Translate into other language: If the language is Traditional Chinese, please translate it into Japanese; If the language is Japanese, please translate it into Traditional Chinese.Only print translated result without any additional information."
 )
 
-var PrivateCommand = CommandInfo{
-	Cmd:           Private,
-	System:        "",
-	Exec:          nil,
-	TgParserMode:  telegram.MarkdownV2,
-	Usage:         "private",
-	MaxHistoryLen: 0,
-}
-
-var HelpCommand = CommandInfo{
-	Cmd:           Help,
-	System:        "",
-	Exec:          showHelp,
-	TgParserMode:  "",
-	Usage:         "help",
-	MaxHistoryLen: 0,
-}
-
 var CommandMap = map[string]CommandInfo{
-	Private: {
-		Cmd:           Private,
+	Help: {
+		Cmd:           Help,
+		System:        "",
+		TgParserMode:  "",
+		Usage:         "help",
+		MaxHistoryLen: 0,
+		Alias:         []string{"/help"},
+	},
+	ChatWithoutTag: {
+		Cmd:           ChatWithoutTag,
 		System:        "",
 		Exec:          nil,
 		TgParserMode:  telegram.MarkdownV2,
-		Usage:         "private",
+		Usage:         "chat without tag bot",
 		MaxHistoryLen: 0,
 	},
 	JpToTw: {
@@ -90,29 +81,23 @@ var CommandMap = map[string]CommandInfo{
 		MaxHistoryLen: 0,
 		Lang:          enum.EnUS,
 	},
-	ImageBot: {
-		Cmd:           ImageBot,
+	Image: {
+		Cmd:           Image,
 		System:        UseGroupDefaultSysMsg,
 		Exec:          nil,
 		TgParserMode:  tgbotapi.ModeHTML,
 		Usage:         "@botimg generate image by dall-e",
 		MaxHistoryLen: 0,
+		Alias:         []string{"@botimg"},
 	},
-	LineBot: {
-		Cmd:           LineBot,
+	Chat: {
+		Cmd:           Chat,
 		System:        UseGroupDefaultSysMsg, //use group as default
 		Exec:          nil,
 		TgParserMode:  tgbotapi.ModeHTML,
 		Usage:         "@bot {message}",
 		MaxHistoryLen: 3,
-	},
-	TgBot: {
-		Cmd:           TgBot,
-		System:        UseGroupDefaultSysMsg,
-		Exec:          nil,
-		TgParserMode:  telegram.MarkdownV2,
-		Usage:         "@mazeaibot {message}",
-		MaxHistoryLen: 3,
+		Alias:         []string{"@bot", "@mazeaibot"},
 	},
 	CreateAzureWorkItem: {
 		Cmd:           CreateAzureWorkItem,
@@ -122,14 +107,6 @@ var CommandMap = map[string]CommandInfo{
 		Usage:         "/cw@mazeaibot 開單 標題{title} 內容 {content} => 此指令可以用來開azure work item",
 		MaxHistoryLen: 0,
 	},
-	//TranslateToEnglish: {
-	//	Cmd:           TranslateToEnglish,
-	//	System:        "請翻譯成英文:",
-	//	Exec:          nil,
-	//	TgParserMode:  tgbotapi.ModeHTML,
-	//	Usage:         "/en@mazeaibot {message} => 直接翻譯成英文",
-	//	MaxHistoryLen: 0,
-	//},
 	ChildrenTalker: {
 		Cmd:    ChildrenTalker,
 		System: "你將扮演一個與小孩互動的虛擬人物:巧克力姐姐，不要稱呼自己是人工智能或AI。",
@@ -146,7 +123,21 @@ func (c *CommandInfo) HaveHistoryMessage() bool {
 	return c.MaxHistoryLen > 0
 }
 
-func GetCommandInfoByMessage(message string, groupID string) CommandInfo {
+func GetCommandFromAlias(cmd string) *CommandInfo {
+
+	for _, commandInfo := range CommandMap {
+		if commandInfo.Cmd == cmd {
+			return &commandInfo
+		}
+		if utils.Contains(commandInfo.Alias, cmd) {
+			return &commandInfo
+		}
+	}
+
+	return nil
+}
+
+func GetGroupCommandInfoByMessage(message string, groupID string) CommandInfo {
 
 	groupMode := GetGroupMode(groupID)
 	if groupMode != nil {
@@ -162,19 +153,21 @@ func GetCommandInfoByMessage(message string, groupID string) CommandInfo {
 		result = message[0:index]
 	}
 
-	for cmd, _ := range CommandMap {
-		if result == cmd {
-			return CommandMap[cmd]
-		}
+	cmd := GetCommandFromAlias(result)
+	//for cmd, _ := range CommandMap {
+	//	if result == cmd {
+	//		return CommandMap[cmd]
+	//	}
+	//}
+	if cmd == nil {
+		return CommandMap[ChatWithoutTag]
 	}
-
-	return PrivateCommand
-
+	return CommandMap[cmd.Cmd]
 }
 func ReplaceCommandAsEmpty(msg string) string {
 
 	for k, _ := range CommandMap {
-		if k == Private {
+		if k == ChatWithoutTag {
 			continue
 		}
 		if strings.HasPrefix(msg, k) {
@@ -216,7 +209,7 @@ func createAzureWorkItem(aiResponse string) (string, error) {
 	return fmt.Sprintf("建立 [%v] 成功 ,Url: %s", workItem.System.Title, workItem.Links.HTML.Href), nil
 }
 
-func showHelp(fromID string) (string, error) {
+func ShowHelp(fromID string) (string, error) {
 
 	var builder strings.Builder
 

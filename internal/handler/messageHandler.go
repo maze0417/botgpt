@@ -32,21 +32,16 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		return err, response
 	}
 
-	command := ai.GetCommandInfoByMessage(messageFrom, groupID)
+	command := ai.GetGroupCommandInfoByMessage(messageFrom, groupID)
 
-	isImage := false
+	isImage := command.Cmd == ai.Image
 	isCommand := strings.HasPrefix(messageFrom, "/")
-	switch command.Cmd {
-	case ai.Private:
-		if isGroup {
-			errMsg := fmt.Sprintf("empty Command and IsGroup , just return ")
-			log.Println(errMsg)
-			return utils.NewKnownError(enum.FALIURE, errMsg), nil
-		}
-	case ai.ImageBot:
-		isImage = true
-	default:
+	ignoreChat := command.Cmd == ai.ChatWithoutTag && isGroup
 
+	if ignoreChat {
+		errMsg := fmt.Sprintf("IsGroup and mode is chat , just return ")
+		log.Println(errMsg)
+		return utils.NewKnownError(enum.FALIURE, errMsg), nil
 	}
 
 	if len(replyMessage) > 0 && !isCommand {
@@ -145,37 +140,38 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 }
 
 func getOrSetGroupMode(messageFrom string, groupID string) (error, *models.AiResponse, bool) {
-	if messageFrom == ai.Help {
-		helpText, _ := ai.HelpCommand.Exec(groupID)
+	cmd := ai.GetCommandFromAlias(messageFrom)
+
+	if cmd == nil {
+		return nil, nil, false
+	}
+
+	if cmd.Cmd == ai.Help {
+		helpText, _ := ai.ShowHelp(groupID)
 		return nil, &models.AiResponse{
 			IsImage:     false,
 			IsText:      true,
 			Text:        helpText,
 			TgParseMode: "",
-			CommandMode: ai.HelpCommand.Usage,
-			Lang:        ai.HelpCommand.Lang,
+			CommandMode: cmd.Usage,
+			Lang:        cmd.Lang,
 		}, true
 	}
 
-	for cmd, cmdInfo := range ai.CommandMap {
-		if messageFrom == cmd {
-			resp := ai.SetGroupMode(groupID, cmd)
+	resp := ai.SetGroupMode(groupID, cmd.Cmd)
 
-			if resp == nil {
-				continue
-			}
-			return nil, &models.AiResponse{
-				IsImage:     false,
-				IsText:      true,
-				Text:        "mode changed to " + cmd,
-				TgParseMode: "",
-				CommandMode: cmdInfo.Usage,
-				Lang:        cmdInfo.Lang,
-			}, true
-		}
+	if resp == nil {
+		return nil, nil, false
 	}
+	return nil, &models.AiResponse{
+		IsImage:     false,
+		IsText:      true,
+		Text:        "mode changed to " + cmd.Cmd,
+		TgParseMode: "",
+		CommandMode: cmd.Usage,
+		Lang:        cmd.Lang,
+	}, true
 
-	return nil, nil, false
 }
 
 func getSetTotalMessages(userID string, msg gpt3.Message, maxUserMessageLen int) (error, []gpt3.Message) {

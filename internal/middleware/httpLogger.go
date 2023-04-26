@@ -66,13 +66,14 @@ func HttpLoggerMiddleware(c *gin.Context) {
 
 		logString := fmt.Sprintf("[HTTP] %v %v %v %v %v", requestId, c.Request.Method, c.Request.URL.Path, statusCode, duration)
 		log.WithFields(log.Fields{
-			"type":         "http",
-			"requestId":    requestId,
-			"requestUrl":   c.Request.RequestURI,
-			"requestBody":  jsonBody,
-			"statusCode":   statusCode,
-			"duration":     duration.Seconds(),
-			"responseBody": responseBody,
+			"type":           "http",
+			"requestId":      requestId,
+			"requestHeaders": getRequestHeaders(c),
+			"requestUrl":     c.Request.RequestURI,
+			"requestBody":    jsonBody,
+			"statusCode":     statusCode,
+			"duration":       duration.Seconds(),
+			"responseBody":   responseBody,
 		}).Info(logString)
 	}()
 	c.Header("Content-Type", "application/json")
@@ -96,4 +97,15 @@ func contains(elems []string, v string) bool {
 		}
 	}
 	return false
+}
+
+// getRequestHeaders 從請求中獲取標頭並返回一個易讀的字串
+func getRequestHeaders(c *gin.Context) string {
+	var headers strings.Builder
+	for key, values := range c.Request.Header {
+		for _, value := range values {
+			headers.WriteString(fmt.Sprintf("%s: %s\n", key, value))
+		}
+	}
+	return headers.String()
 }

@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-const FileTimeFormat = "2006-01-02"
-
 func GetUploadDir() string {
 	c := config.GetConfig()
 

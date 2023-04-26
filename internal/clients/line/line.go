@@ -2,8 +2,11 @@ package line
 
 import (
 	"botgpt/internal/config"
+	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"io"
+	"net/http"
 	"sync"
 
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -32,5 +35,27 @@ func CreateLineClient() *linebot.Client {
 		fmt.Println("line client create success")
 	})
 	return myLineBot
+
+}
+
+// ParseRequest func
+func ParseRequest(r *http.Request) ([]*linebot.Event, error) {
+
+	if config.IsNotLocal() {
+		return CreateLineClient().ParseRequest(r)
+	}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	request := &struct {
+		Events []*linebot.Event `json:"events"`
+	}{}
+	if err = json.Unmarshal(body, request); err != nil {
+		return nil, err
+	}
+	return request.Events, nil
 
 }

@@ -55,7 +55,7 @@ func (h WebHookController) ClientMessage(c *gin.Context) {
 	utils.SendResponse(http.StatusOK, response.OKHasContent(res), c)
 }
 func (h WebHookController) LineMessage(c *gin.Context) {
-	events, err := line.CreateLineClient().ParseRequest(c.Request)
+	events, err := line.ParseRequest(c.Request)
 	if err != nil {
 
 		utils.SendResponse(http.StatusBadRequest, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)

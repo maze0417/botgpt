@@ -15,15 +15,15 @@ const (
 
 var GroupMapping = map[string]GroupSetting{
 	PrivateTestBot: {
-		CommandMode: Private,
+		CommandMode: ChatWithoutTag,
 		Enable:      false,
 	},
 	LineGroupGpt3Turbo: {
-		CommandMode: LineBot,
+		CommandMode: Chat,
 		Enable:      false,
 	},
 	TelegramGroupGpt3Turbo: {
-		CommandMode: TgBot,
+		CommandMode: Chat,
 		Enable:      false,
 	},
 	PhTgProject: {
