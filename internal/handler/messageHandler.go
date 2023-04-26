@@ -48,10 +48,6 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		appendMessage(messageFrom, replyMessage)
 	}
 
-	if !isImage && !isCommand {
-		isImage = strings.Contains(messageFrom, "draw") ||
-			strings.Contains(messageFrom, "畫")
-	}
 	message := ai.ReplaceCommandAsEmpty(messageFrom)
 
 	if isCommand && len(message) <= 1 {

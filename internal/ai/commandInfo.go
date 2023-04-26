@@ -88,7 +88,7 @@ var CommandMap = map[string]CommandInfo{
 		TgParserMode:  tgbotapi.ModeHTML,
 		Usage:         "@botimg generate image by dall-e",
 		MaxHistoryLen: 0,
-		Alias:         []string{"@botimg"},
+		Alias:         []string{"@botimg", "draw", "畫"},
 	},
 	Chat: {
 		Cmd:           Chat,
@@ -154,11 +154,7 @@ func GetGroupCommandInfoByMessage(message string, groupID string) CommandInfo {
 	}
 
 	cmd := GetCommandFromAlias(result)
-	//for cmd, _ := range CommandMap {
-	//	if result == cmd {
-	//		return CommandMap[cmd]
-	//	}
-	//}
+
 	if cmd == nil {
 		return CommandMap[ChatWithoutTag]
 	}
