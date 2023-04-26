@@ -12,7 +12,8 @@ import (
 	"sync"
 )
 
-const MarkdownV2 = "MarkdownV2"
+// const MarkdownV2 = "MarkdownV2"
+const MarkdownV2 = ""
 
 var (
 	tgOnce   sync.Once
