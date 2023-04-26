@@ -7,7 +7,7 @@ import (
 )
 
 func TestClient_Transcribe(t *testing.T) {
-	config.InitTest()
+	config.InitTest("botgpt")
 
 	outputMp3Name := fmt.Sprintf("D:/AgProject/sms_compose/sms_server/ffmpeg/testgroup-123.mp3")
 	res, err := Transcribe(outputMp3Name)
@@ -22,7 +22,7 @@ func TestClient_Transcribe(t *testing.T) {
 }
 
 func TestM4a(t *testing.T) {
-	config.InitTest()
+	config.InitTest("botgpt")
 
 	outputMp3Name := fmt.Sprintf("D:/AgProject/sms_compose/sms_server/ffmpeg/test_noise.m4a")
 	res, err := Transcribe(outputMp3Name)
