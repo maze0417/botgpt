@@ -2,13 +2,11 @@ package ai
 
 import (
 	"botgpt/internal/clients/azure"
-	"botgpt/internal/clients/telegram"
 	"botgpt/internal/enum"
 	"botgpt/internal/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strings"
 )
 
@@ -54,10 +52,10 @@ var CommandMap = map[string]CommandInfo{
 		Alias:         []string{"/help"},
 	},
 	ChatWithoutTag: {
-		Cmd:           ChatWithoutTag,
-		System:        "",
-		Exec:          nil,
-		TgParserMode:  telegram.MarkdownV2,
+		Cmd:    ChatWithoutTag,
+		System: "",
+		Exec:   nil,
+		//TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/chatnotag chat without tag bot",
 		MaxHistoryLen: 0,
 	},
@@ -74,9 +72,9 @@ var CommandMap = map[string]CommandInfo{
 	EnToTw: {
 		Cmd: EnToTw,
 		//System:        "Translation Bot",
-		System:        EnTwPrompt,
-		Exec:          trimPrefixIfNeeded,
-		TgParserMode:  tgbotapi.ModeHTML,
+		System: EnTwPrompt,
+		Exec:   trimPrefixIfNeeded,
+		//TgParserMode:  tgbotapi.ModeHTML,
 		Usage:         "/entw@mazeaibot translate to en-US",
 		MaxHistoryLen: 0,
 		Lang:          enum.EnUS,
@@ -91,19 +89,19 @@ var CommandMap = map[string]CommandInfo{
 		Alias:         []string{"@botimg", "draw", "畫"},
 	},
 	Chat: {
-		Cmd:           Chat,
-		System:        UseGroupDefaultSysMsg, //use group as default
-		Exec:          nil,
-		TgParserMode:  telegram.MarkdownV2,
+		Cmd:    Chat,
+		System: UseGroupDefaultSysMsg, //use group as default
+		Exec:   nil,
+		//TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/chat {message}",
 		MaxHistoryLen: 3,
 		Alias:         []string{"@bot", "@mazeaibot"},
 	},
 	CreateAzureWorkItem: {
-		Cmd:           CreateAzureWorkItem,
-		System:        "幫忙把把對話裡面的關於`標題` 跟 `內容`轉化成 json , 範例:幫我建立一張azure workitem 標題是`MyHeader` 內容是`Mycontent` 只需要輸出JSON 不需要其他內容: `[{\"op\": \"add\",\"path\": \"/fields/System.Title\",\"value\": \"MyHeader\"},{\"op\": \"add\",\"path\": \"/fields/System.Description\",\"value\": \"Mycontent\"}]` ",
-		Exec:          createAzureWorkItem,
-		TgParserMode:  telegram.MarkdownV2,
+		Cmd:    CreateAzureWorkItem,
+		System: "幫忙把把對話裡面的關於`標題` 跟 `內容`轉化成 json , 範例:幫我建立一張azure workitem 標題是`MyHeader` 內容是`Mycontent` 只需要輸出JSON 不需要其他內容: `[{\"op\": \"add\",\"path\": \"/fields/System.Title\",\"value\": \"MyHeader\"},{\"op\": \"add\",\"path\": \"/fields/System.Description\",\"value\": \"Mycontent\"}]` ",
+		Exec:   createAzureWorkItem,
+		//TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/cw@mazeaibot 開單 標題{title} 內容 {content} => 此指令可以用來開azure work item",
 		MaxHistoryLen: 0,
 	},
@@ -111,8 +109,8 @@ var CommandMap = map[string]CommandInfo{
 		Cmd:    ChildrenTalker,
 		System: "你將扮演一個與小孩互動的虛擬人物:巧克力姐姐，不要稱呼自己是人工智能或AI。",
 		//System:        "你是一位特立獨行、充滿愛心的人物，名為巧克力姐姐。你喜歡和小孩溝通，並且經常會將自己當作小孩的好朋友，開始一場充滿想像力的冒險之旅。你喜歡讓小孩開心，並且總是以最真誠的態度對待他們。你總是準備著一些小驚喜，例如準備了一份在小孩最喜愛的食物裡藏著神秘禮物的巧克力，這讓小孩嘴巴裡美味難忘，心底裡溫暖感激。你是一種慷慨大方、友善親切的存在，小孩總是對你充滿好感和信任。你的微笑和笑聲，能夠撫平所有痛苦和忧伤的心靈，這就是你所擁有的使命和魅力。",
-		Exec:          nil,
-		TgParserMode:  telegram.MarkdownV2,
+		Exec: nil,
+		//TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/ct@mazeaibot {message} => ai baby",
 		MaxHistoryLen: 3,
 		PromptPrefix:  "用小孩能夠聽懂的方式",
