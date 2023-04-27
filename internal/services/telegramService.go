@@ -97,9 +97,9 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 		return nil, err
 	}
 	escapedMessage := gptResponse.Text
-	//if gptResponse.IsText && gptResponse.TgParseMode == telegram.MarkdownV2 {
-	//	escapedMessage = telegram.EscapeMessage(escapedMessage)
-	//}
+	if gptResponse.IsText && gptResponse.TgParseMode == telegram.MarkdownV2 {
+		escapedMessage = telegram.EscapeMessage(escapedMessage)
+	}
 	if gptResponse.IsImage {
 		gptResponse.TgParseMode = ""
 	}

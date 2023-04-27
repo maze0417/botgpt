@@ -30,6 +30,22 @@ func NewPolly() interfaces.ITextToSpeech {
 	return &Polly{}
 }
 
+func getPollyClient() *polly.Polly {
+	once.Do(func() {
+		// Create a new session with the default AWS configuration
+		sess, err := session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		// Create a Polly client
+		pollyClient = polly.New(sess)
+	})
+
+	return pollyClient
+}
 func (p Polly) GetLangFromText(text string) string {
 	detector := lingua.NewLanguageDetectorBuilder().
 		FromAllLanguages().
@@ -52,22 +68,6 @@ func (p Polly) TextToSpeech(text string, outputFile string, outputFormat string,
 	return textToSpeech(text, outputFile, outputFormat, lang)
 }
 
-func getPollyClient() *polly.Polly {
-	once.Do(func() {
-		// Create a new session with the default AWS configuration
-		sess, err := session.NewSessionWithOptions(session.Options{
-			SharedConfigState: session.SharedConfigEnable,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		// Create a Polly client
-		pollyClient = polly.New(sess)
-	})
-
-	return pollyClient
-}
 func textToSpeech(text string, outputFile string, outputFormat string, lang string) error {
 	client := getPollyClient()
 
