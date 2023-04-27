@@ -24,3 +24,13 @@ func ConvertMp3ToOgg(inputMo3Name string, outputOggName string) error {
 	}
 	return nil
 }
+func ConvertM4AToMP3(inputFile, outputFile string) error {
+	cmd := exec.Command("ffmpeg", "-i", inputFile, "-vn", "-acodec", "libmp3lame", "-q:a", "2", outputFile)
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("error executing FFmpeg command: %w", err)
+	}
+
+	return nil
+}

@@ -20,7 +20,7 @@ func RegisterFactory() {
 	var textToSpeech = aws.NewPolly()
 
 	var appService = services.NewAppService(aiProvider, messageHandler)
-	var lineService = services.NewLineService(aiProvider, messageHandler)
+	var lineService = services.NewLineService(aiProvider, messageHandler, textToSpeech)
 	var telegramService = services.NewTelegramService(aiProvider, messageHandler, textToSpeech)
 
 	statusController = controllers.NewStatusController()

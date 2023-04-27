@@ -17,6 +17,8 @@ import (
 	"strings"
 )
 
+const startPrompt = "sending..."
+
 type TelegramService struct {
 	aiProvider     interfaces.IAiProvider
 	messageHandler interfaces.IMessageHandler
@@ -77,6 +79,8 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
 	groupID := fmt.Sprintf("%v", update.Message.Chat.ID)
 
+	resMessage, _ := telegram.ReplayToChat(message.Chat.ID, startPrompt, "", update.Message.MessageID)
+
 	_ = telegram.SendBotAction(update.Message.Chat.ID, tgbotapi.ChatTyping)
 
 	err, gptResponse := t.messageHandler.Send(messageFrom, update.Message.Chat.IsGroup(), userID, groupID, messageReply)
@@ -92,19 +96,23 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 	default:
 		// unknown error occurred, log the error
 		log.Errorln(err)
-		_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), "", update.Message.MessageID)
+		_ = telegram.UpdateMessage(message.Chat.ID, err.Error(), resMessage.MessageID)
+
+		//_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), "", update.Message.MessageID)
 
 		return nil, err
 	}
 	escapedMessage := gptResponse.Text
-	if gptResponse.IsText && gptResponse.TgParseMode == telegram.MarkdownV2 {
-		escapedMessage = telegram.EscapeMessage(escapedMessage)
-	}
+	//if gptResponse.IsText && gptResponse.TgParseMode == telegram.MarkdownV2 {
+	//	escapedMessage = telegram.EscapeMessage(escapedMessage)
+	//}
 	if gptResponse.IsImage {
 		gptResponse.TgParseMode = ""
 	}
 
-	_, err = telegram.ReplayToChat(message.Chat.ID, escapedMessage, gptResponse.TgParseMode, update.Message.MessageID)
+	//_, err = telegram.ReplayToChat(message.Chat.ID, escapedMessage, gptResponse.TgParseMode, update.Message.MessageID)
+	err = telegram.UpdateMessage(message.Chat.ID, escapedMessage, resMessage.MessageID)
+
 	if err != nil {
 		_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), gptResponse.TgParseMode, update.Message.MessageID)
 	}
@@ -170,7 +178,6 @@ func (t TelegramService) HandleVoice(update tgbotapi.Update) (*models.AiResponse
 
 	_ = telegram.SendBotAction(update.Message.Chat.ID, tgbotapi.ChatTyping)
 
-	startPrompt := "語音辨識中(Processing your audio) ..."
 	resMessage, _ := telegram.ReplayToChat(message.Chat.ID, startPrompt, "", update.Message.MessageID)
 
 	text, err := t.aiProvider.Transcribe(outputName)

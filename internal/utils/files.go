@@ -21,11 +21,11 @@ func GetUploadDir() string {
 
 	if err := os.Mkdir(rootPath, 0755); os.IsExist(err) {
 		// triggers if dir already exists
-		return rootPath + "/"
+		return rootPath
 	}
 	_ = os.Mkdir(rootPath, 0777)
 
-	return rootPath + "/"
+	return rootPath
 }
 
 func GetNewFilePath(ext string) (string, string) {

@@ -25,9 +25,9 @@ type CommandInfo struct {
 }
 
 const (
-	ChatWithoutTag      = "/chatnotag"
-	Chat                = "/chat"
-	Image               = "/image"
+	ChatWithoutTag      = "/chatnotag@mazeaibot"
+	Chat                = "/chat@mazeaibot"
+	Image               = "/image@mazeaibot"
 	CreateAzureWorkItem = "/cw@mazeaibot"
 	TranslateToEnglish  = "/en@mazeaibot"
 	ChildrenTalker      = "/ct@mazeaibot"
@@ -60,6 +60,7 @@ var CommandMap = map[string]CommandInfo{
 		TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/chatnotag chat without tag bot",
 		MaxHistoryLen: 0,
+		Alias:         []string{"/chatnotag"},
 	},
 	JpToTw: {
 		Cmd: JpToTw,
@@ -70,6 +71,7 @@ var CommandMap = map[string]CommandInfo{
 		Usage:         "/jptw@mazeaibot translate to ja-JP",
 		MaxHistoryLen: 0,
 		Lang:          enum.JaJP,
+		Alias:         []string{"/jptw"},
 	},
 	EnToTw: {
 		Cmd: EnToTw,
@@ -80,6 +82,7 @@ var CommandMap = map[string]CommandInfo{
 		Usage:         "/entw@mazeaibot translate to en-US",
 		MaxHistoryLen: 0,
 		Lang:          enum.EnUS,
+		Alias:         []string{"/entw"},
 	},
 	Image: {
 		Cmd:    Image,
@@ -88,7 +91,7 @@ var CommandMap = map[string]CommandInfo{
 		//TgParserMode:  tgbotapi.ModeHTML,
 		Usage:         "/image generate image by dall-e",
 		MaxHistoryLen: 0,
-		Alias:         []string{"@botimg", "draw", "畫"},
+		Alias:         []string{"@botimg", "draw", "畫", "/image"},
 	},
 	Chat: {
 		Cmd:           Chat,
@@ -97,7 +100,7 @@ var CommandMap = map[string]CommandInfo{
 		TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/chat {message}",
 		MaxHistoryLen: 3,
-		Alias:         []string{"@bot", "@mazeaibot"},
+		Alias:         []string{"@bot", "@mazeaibot", "/chat"},
 	},
 	CreateAzureWorkItem: {
 		Cmd:           CreateAzureWorkItem,
@@ -106,6 +109,7 @@ var CommandMap = map[string]CommandInfo{
 		TgParserMode:  telegram.MarkdownV2,
 		Usage:         "/cw@mazeaibot 開單 標題{title} 內容 {content} => 此指令可以用來開azure work item",
 		MaxHistoryLen: 0,
+		Alias:         []string{"/cw"},
 	},
 	ChildrenTalker: {
 		Cmd:    ChildrenTalker,
@@ -116,6 +120,7 @@ var CommandMap = map[string]CommandInfo{
 		Usage:         "/ct@mazeaibot {message} => ai baby",
 		MaxHistoryLen: 3,
 		PromptPrefix:  "用小孩能夠聽懂的方式",
+		Alias:         []string{"/aibaby"},
 	},
 }
 

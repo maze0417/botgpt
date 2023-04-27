@@ -58,9 +58,9 @@ func CreateOrGetTgClient() *tgbotapi.BotAPI {
 func ReplayToChat(chatID int64, msg string, tgParseMode string, replyMessageID int) (*tgbotapi.Message, error) {
 
 	newMsg := tgbotapi.NewMessage(chatID, msg)
-	if len(tgParseMode) > 0 {
-		newMsg.ParseMode = tgParseMode
-	}
+	//if len(tgParseMode) > 0 {
+	//	newMsg.ParseMode = tgParseMode
+	//}
 	if replyMessageID > 0 {
 		newMsg.ReplyToMessageID = replyMessageID
 	}

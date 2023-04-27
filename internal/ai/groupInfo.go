@@ -54,7 +54,12 @@ func SetGroupMode(groupID string, cmd string) *GroupSetting {
 
 	v, ok := GroupMapping[groupID]
 	if !ok {
-		return nil
+		v = GroupSetting{
+			CommandMode: cmd,
+			Enable:      true,
+		}
+		GroupMapping[groupID] = v
+		return &v
 	}
 	cmdInfo := GetCommandBy(cmd)
 	if cmdInfo == nil {
@@ -64,8 +69,7 @@ func SetGroupMode(groupID string, cmd string) *GroupSetting {
 	v.CommandMode = cmdInfo.Cmd
 	if v.Enable {
 		v.Enable = false
-	}
-	if !v.Enable {
+	} else {
 		v.Enable = true
 	}
 
