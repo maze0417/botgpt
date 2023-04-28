@@ -6,6 +6,7 @@ import (
 	"botgpt/internal/interfaces"
 	"botgpt/internal/utils"
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/polly"
 	"github.com/google/uuid"
 	"github.com/line/line-bot-sdk-go/linebot"
 	log "github.com/sirupsen/logrus"
@@ -151,14 +152,16 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 	case nil:
 		// no error occurred, continue with your logic
 		builder.WriteString(gptResponse.Text)
-		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), format)
-		log.Printf("try convert text to voice %s \n", outputFile)
 
 		lang := l.textToSpeech.GetLangFromText(gptResponse.Text)
 		if len(lang) == 0 {
 			lang = gptResponse.Text
 		}
-		err = l.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, format, lang)
+
+		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), polly.OutputFormatMp3)
+		log.Printf("try convert text to voice %s \n", outputFile)
+
+		err = l.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, polly.OutputFormatMp3, lang)
 		if err != nil {
 			builder.WriteString(err.Error())
 			log.Error(err)
