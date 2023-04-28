@@ -79,7 +79,7 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 	userID := fmt.Sprintf("tg:%s:%v", message.From.UserName, message.Chat.ID)
 	groupID := fmt.Sprintf("%v", update.Message.Chat.ID)
 
-	resMessage, _ := telegram.ReplayToChat(message.Chat.ID, startPrompt, "", update.Message.MessageID)
+	//resMessage, _ := telegram.ReplayToChat(message.Chat.ID, startPrompt, "", update.Message.MessageID)
 
 	_ = telegram.SendBotAction(update.Message.Chat.ID, tgbotapi.ChatTyping)
 
@@ -96,9 +96,9 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 	default:
 		// unknown error occurred, log the error
 		log.Errorln(err)
-		_ = telegram.UpdateMessage(message.Chat.ID, err.Error(), resMessage.MessageID)
+		//_ = telegram.UpdateMessage(message.Chat.ID, err.Error(), resMessage.MessageID)
 
-		//_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), "", update.Message.MessageID)
+		_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), "", update.Message.MessageID)
 
 		return nil, err
 	}
@@ -110,8 +110,8 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 		gptResponse.TgParseMode = ""
 	}
 
-	//_, err = telegram.ReplayToChat(message.Chat.ID, escapedMessage, gptResponse.TgParseMode, update.Message.MessageID)
-	err = telegram.UpdateMessage(message.Chat.ID, escapedMessage, resMessage.MessageID)
+	_, err = telegram.ReplayToChat(message.Chat.ID, escapedMessage, gptResponse.TgParseMode, update.Message.MessageID)
+	//err = telegram.UpdateMessage(message.Chat.ID, escapedMessage, resMessage.MessageID)
 
 	if err != nil {
 		_, _ = telegram.ReplayToChat(message.Chat.ID, err.Error(), gptResponse.TgParseMode, update.Message.MessageID)

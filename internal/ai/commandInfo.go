@@ -142,11 +142,12 @@ func GetCommandFromAlias(cmd string) *CommandInfo {
 	return nil
 }
 
-func GetGroupCommandInfoByMessage(message string, groupID string) CommandInfo {
+func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandInfo {
 
 	groupMode := GetGroupMode(groupID)
 	if groupMode != nil {
 		message = groupMode.CommandMode
+		return CommandMap[groupMode.CommandMode]
 	}
 
 	// Find the index position of the first space
@@ -161,7 +162,7 @@ func GetGroupCommandInfoByMessage(message string, groupID string) CommandInfo {
 	cmd := GetCommandFromAlias(result)
 
 	if cmd == nil {
-		return CommandMap[ChatWithoutTag]
+		return CommandMap[Chat]
 	}
 	return CommandMap[cmd.Cmd]
 }

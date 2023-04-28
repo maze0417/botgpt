@@ -27,16 +27,16 @@ func NewMessageHandler(apiProvider interfaces.IAiProvider) interfaces.IMessageHa
 
 func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
-	err, response, setCommand := getOrSetGroupMode(messageFrom, groupID)
+	err, response, setCommand := setGroupModeIfMessageOnlyCommand(messageFrom, groupID)
 	if setCommand {
 		return err, response
 	}
 
-	command := ai.GetGroupCommandInfoByMessage(messageFrom, groupID)
+	command := ai.GetGroupModeOrCommandInfoByMessage(messageFrom, groupID)
 
 	isImage := command.Cmd == ai.Image
 	isCommand := strings.HasPrefix(messageFrom, "/")
-	ignoreChat := command.Cmd == ai.ChatWithoutTag && isGroup
+	ignoreChat := command.Cmd == ai.Chat && isGroup
 
 	if ignoreChat {
 		errMsg := fmt.Sprintf("IsGroup and mode is chat , just return ")
@@ -135,7 +135,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 	}
 }
 
-func getOrSetGroupMode(messageFrom string, groupID string) (error, *models.AiResponse, bool) {
+func setGroupModeIfMessageOnlyCommand(messageFrom string, groupID string) (error, *models.AiResponse, bool) {
 	cmd := ai.GetCommandFromAlias(messageFrom)
 
 	if cmd == nil {
