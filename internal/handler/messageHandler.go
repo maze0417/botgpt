@@ -38,6 +38,8 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 	isCommand := strings.HasPrefix(messageFrom, "/")
 	ignoreChat := command.Cmd == ai.Chat && isGroup
 
+	log.Printf("receive message from %s , group :%v , command %s ", messageFrom, isGroup, command.Cmd)
+
 	if ignoreChat {
 		errMsg := fmt.Sprintf("IsGroup and mode is chat , just return ")
 		log.Println(errMsg)
