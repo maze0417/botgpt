@@ -36,7 +36,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 
 	isImage := command.Cmd == ai.Image
 	isCommand := strings.HasPrefix(messageFrom, "/")
-	ignoreChat := command.Cmd == ai.Chat && isGroup
+	ignoreChat := command.Cmd == ai.Chat && isGroup && !ai.HasCommandPrefix(messageFrom)
 
 	log.Printf("receive message from %s , group :%v , command %s ", messageFrom, isGroup, command.Cmd)
 

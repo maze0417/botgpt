@@ -142,6 +142,32 @@ func GetCommandFromAlias(cmd string) *CommandInfo {
 	return nil
 }
 
+func HasCommandPrefix(message string) bool {
+
+	index := strings.Index(message, " ")
+
+	// Substring up to the first space
+	cmd := message
+	if index < 0 {
+		return false
+	}
+
+	if index >= 0 {
+		cmd = message[0:index]
+	}
+
+	for _, commandInfo := range CommandMap {
+		if commandInfo.Cmd == cmd {
+			return true
+		}
+		if utils.Contains(commandInfo.Alias, cmd) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandInfo {
 
 	groupMode := GetGroupMode(groupID)
