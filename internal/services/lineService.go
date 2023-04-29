@@ -153,6 +153,8 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 		// no error occurred, continue with your logic
 		builder.WriteString(gptResponse.Text)
 
+		line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage(builder.String())).Do()
+
 		lang := l.textToSpeech.GetLangFromText(gptResponse.Text)
 		if len(lang) == 0 {
 			lang = gptResponse.Text
@@ -161,7 +163,7 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 		outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), polly.OutputFormatMp3)
 		log.Printf("try convert text to voice %s \n", outputFile)
 
-		err = l.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, polly.OutputFormatMp3, lang)
+		err, data = l.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, polly.OutputFormatMp3, lang)
 		if err != nil {
 			builder.WriteString(err.Error())
 			log.Error(err)

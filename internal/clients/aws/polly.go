@@ -64,11 +64,11 @@ func (p Polly) GetLangFromText(text string) string {
 	return lang
 }
 
-func (p Polly) TextToSpeech(text string, outputFile string, outputFormat string, lang string) error {
+func (p Polly) TextToSpeech(text string, outputFile string, outputFormat string, lang string) (error, []byte) {
 	return textToSpeech(text, outputFile, outputFormat, lang)
 }
 
-func textToSpeech(text string, outputFile string, outputFormat string, lang string) error {
+func textToSpeech(text string, outputFile string, outputFormat string, lang string) (error, []byte) {
 	client := getPollyClient()
 
 	actor, ok := LangMap[lang]
@@ -97,20 +97,20 @@ func textToSpeech(text string, outputFile string, outputFormat string, lang stri
 
 	output, err := client.SynthesizeSpeech(input)
 	if err != nil {
-		return err
+		return err, nil
 	}
 
 	// Read the output audio stream
 	audioBytes, err := io.ReadAll(output.AudioStream)
 	if err != nil {
-		return err
+		return err, nil
 	}
 
 	// Save the synthesized speech to a file
 	err = os.WriteFile(outputFile, audioBytes, 0644)
 	if err != nil {
-		return err
+		return err, nil
 	}
 
-	return nil
+	return nil, audioBytes
 }

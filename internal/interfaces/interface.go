@@ -20,6 +20,6 @@ type IMessageService interface {
 	HandleIFVoice(input interface{})
 }
 type ITextToSpeech interface {
-	TextToSpeech(text string, outputFile string, outputFormat string, lang string) error
+	TextToSpeech(text string, outputFile string, outputFormat string, lang string) (error, []byte)
 	GetLangFromText(text string) string
 }
