@@ -153,8 +153,6 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 		// no error occurred, continue with your logic
 		builder.WriteString(gptResponse.Text)
 
-		line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage(builder.String())).Do()
-
 		lang := l.textToSpeech.GetLangFromText(gptResponse.Text)
 		if len(lang) == 0 {
 			lang = gptResponse.Text
@@ -174,20 +172,17 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 		s3Client := aws.NewS3()
 		duration := 3000 // 語音檔案的播放持續時間，單位為毫秒
 
-		line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage("sending...")).Do()
-
 		audioFileURL, err := s3Client.Upload(outputFile, data)
 		if err != nil {
 			log.Println("無法上傳到S3:", err)
 			return
 		}
 
-		_, err = line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewAudioMessage(audioFileURL, duration)).Do()
-
-		//_, err = bot.ReplyMessage(
-		//	event.ReplyToken,
-		//	linebot.NewAudioMessage(audioFileURL, duration),
-		//).Do()
+		_, err = bot.ReplyMessage(
+			event.ReplyToken,
+			linebot.NewTextMessage(builder.String()),
+			linebot.NewAudioMessage(audioFileURL, duration),
+		).Do()
 
 		if err != nil {
 			log.Println("無法發送語音檔案:", err)
