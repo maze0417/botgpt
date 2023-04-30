@@ -43,7 +43,7 @@ func TestTextToSpeech(t *testing.T) {
 
 			outputFile := utils.GetUploadDir() + "testts." + polly.OutputFormatMp3
 
-			err := textToSpeech(text, outputFile, polly.OutputFormatMp3, lang)
+			err, _ := textToSpeech(text, outputFile, polly.OutputFormatMp3, lang)
 			if err != nil {
 
 				t.Errorf("Failed to synthesize speech: %v\n", err)
