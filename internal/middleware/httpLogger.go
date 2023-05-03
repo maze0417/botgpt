@@ -16,6 +16,8 @@ var skipLogPath = []string{
 	"/api/v1/captcha/getCaptcha",
 	"/api/v1/merchant/uploadSendMutipleMessage",
 	"/api/v1/merchant/uploadSendMutipleMessageOnlyNumber",
+	"/api/v1/merchant/uploadSendMutipleMessageOnlyNumber",
+	"/conversation",
 }
 
 func HttpLoggerMiddleware(c *gin.Context) {

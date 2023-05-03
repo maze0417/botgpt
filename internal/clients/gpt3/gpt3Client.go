@@ -50,6 +50,25 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 	}
 	return nil, resp.Choices[0].Message.Content
 }
+func CreateChatCompletionStream(totalMessages []Message, userID string) (error, *openai.ChatCompletionStream) {
+
+	ctx := context.Background()
+
+	resp, err := createGp3Client().CreateChatCompletionStream(ctx, openai.ChatCompletionRequest{
+		Model:            gpt3,
+		Messages:         convertToChatCompletionMessages(totalMessages),
+		MaxTokens:        512,
+		PresencePenalty:  0,
+		FrequencyPenalty: 0,
+		User:             userID,
+	})
+
+	if err != nil {
+		log.Errorln(err)
+		return err, nil
+	}
+	return nil, resp
+}
 func convertToChatCompletionMessages(totalMessages []Message) []openai.ChatCompletionMessage {
 	messages := make([]openai.ChatCompletionMessage, 0, len(totalMessages))
 

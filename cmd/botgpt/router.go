@@ -34,6 +34,36 @@ func NewRouter() *gin.Engine {
 		webhook.POST("/update/group", webHookController.UpdateGroup)
 	}
 
+	// ChatGPT
+	root := router.Group("/")
+	root.Use(middleware.CheckHeaderMiddleware(), middleware.HttpLoggerMiddleware)
+
+	conversationsGroup := root.Group("/conversations")
+	{
+		conversationsGroup.GET("", chatgptController.GetConversations)
+
+		// PATCH is official method, POST is added for Java support
+		conversationsGroup.PATCH("", chatgptController.ClearConversations)
+		conversationsGroup.POST("", chatgptController.ClearConversations)
+	}
+
+	conversationGroup := root.Group("/conversation")
+	{
+		conversationGroup.POST("", chatgptController.CreateConversation)
+		conversationGroup.POST("/gen_title/:id", chatgptController.GenerateTitle)
+		conversationGroup.GET("/:id", chatgptController.GetConversation)
+
+		// rename or delete conversation use a same API with different parameters
+		conversationGroup.PATCH("/:id", chatgptController.UpdateConversation)
+		conversationGroup.POST("/:id", chatgptController.UpdateConversation)
+
+		conversationGroup.POST("/message_feedback", chatgptController.FeedbackMessage)
+	}
+
+	// misc
+	root.GET("/models", chatgptController.GetModels).Use(middleware.CheckHeaderMiddleware())
+	root.GET("/accounts/check", chatgptController.GetAccountCheck).Use(middleware.CheckHeaderMiddleware())
+
 	return router
 
 }
