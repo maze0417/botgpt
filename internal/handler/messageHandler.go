@@ -16,16 +16,18 @@ import (
 )
 
 type MessageHandler struct {
-	aiProvider interfaces.IAiProvider
+	aiProvider   interfaces.IAiProvider
+	textToSpeech interfaces.ITextToSpeech
 }
 
-func NewMessageHandler(apiProvider interfaces.IAiProvider) interfaces.IMessageHandler {
+func NewMessageHandler(apiProvider interfaces.IAiProvider, textToSpeech interfaces.ITextToSpeech) interfaces.IMessageHandler {
 	return &MessageHandler{
-		aiProvider: apiProvider,
+		aiProvider:   apiProvider,
+		textToSpeech: textToSpeech,
 	}
 }
 
-func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
+func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, groupID string, replyMessage string) (error, *models.AiResponse) {
 
 	err, response, setCommand := setGroupModeIfMessageOnlyCommand(messageFrom, groupID)
 	if setCommand {
@@ -65,7 +67,7 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 
 	if isImage {
 
-		result, err := g.aiProvider.GenerateImage(message, userID)
+		result, err := m.aiProvider.GenerateImage(message, userID)
 
 		if err != nil {
 			return err, nil
@@ -80,11 +82,11 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 			Lang:        command.Lang,
 		}
 	}
+	sysMsg := m.getSystemPromptFromMessage(message, command)
+	msg := m.getPromptFromMessage(message, command)
+
 	var totalMessages []gpt3.Message
-	msg := gpt3.Message{
-		Role:    gpt3.User,
-		Content: fmt.Sprintf("%v: %v", command.PromptPrefix, message),
-	}
+
 	err, totalMessages = getSetTotalMessages(userID, msg, command.MaxHistoryLen)
 	if err != nil {
 		totalMessages = append(totalMessages, msg)
@@ -94,11 +96,9 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		totalMessages = []gpt3.Message{msg}
 	}
 
-	sysMsg := command.System
-
 	totalMessages = insertSystemMessage(sysMsg, totalMessages)
 
-	err, resp := g.aiProvider.GenerateText(totalMessages, userID)
+	err, resp := m.aiProvider.GenerateText(totalMessages, userID)
 
 	if err != nil {
 		return err, nil
@@ -118,8 +118,8 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 	if err != nil {
 		return err, nil
 	}
-	if command.Exec != nil {
-		azureRes, err := command.Exec(replyToClientMsg)
+	if command.PostExec != nil {
+		azureRes, err := command.PostExec(replyToClientMsg)
 		if err != nil {
 			return err, nil
 		}
@@ -135,6 +135,56 @@ func (g MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		CommandMode: command.Usage,
 		Lang:        command.Lang,
 	}
+}
+
+func (m MessageHandler) getPromptFromMessage(message string, cmd ai.CommandInfo) gpt3.Message {
+	res := gpt3.Message{
+		Role:    gpt3.User,
+		Content: message,
+	}
+
+	if len(cmd.PromptPrefixInject) == 0 || len(message) == 0 {
+		return res
+	}
+	if len(cmd.Lang) == 0 {
+		return gpt3.Message{
+			Role:    gpt3.User,
+			Content: fmt.Sprintf("%v \n %v", cmd.PromptPrefixInject, message),
+		}
+	}
+
+	targetLang := cmd.Lang
+
+	lang := m.textToSpeech.GetLangFromText(message)
+
+	if lang == targetLang {
+		targetLang = enum.ZhTw
+	}
+
+	promptPrefixInject := fmt.Sprintf(cmd.PromptPrefixInject, targetLang)
+	return gpt3.Message{
+		Role:    gpt3.User,
+		Content: fmt.Sprintf("%v \n %v", promptPrefixInject, message),
+	}
+}
+func (m MessageHandler) getSystemPromptFromMessage(message string, cmd ai.CommandInfo) string {
+	if len(message) == 0 {
+		return cmd.SystemPrompt
+	}
+	if len(cmd.Lang) == 0 || len(cmd.SystemPrompt) == 0 {
+		return cmd.SystemPrompt
+	}
+
+	targetLang := cmd.Lang
+
+	lang := m.textToSpeech.GetLangFromText(message)
+
+	if lang == targetLang {
+		targetLang = enum.ZhTw
+	}
+
+	return fmt.Sprintf(cmd.SystemPrompt, targetLang)
+
 }
 
 func setGroupModeIfMessageOnlyCommand(messageFrom string, groupID string) (error, *models.AiResponse, bool) {

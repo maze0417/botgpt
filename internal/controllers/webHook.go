@@ -94,7 +94,7 @@ func (h WebHookController) UpdatePrompt(c *gin.Context) {
 	prompt := c.PostForm("prompt")
 
 	var ct = ai.CommandMap[ai.ChildrenTalker]
-	ct.System = prompt
+	ct.SystemPrompt = prompt
 
 	ai.CommandMap[ai.ChildrenTalker] = ct
 

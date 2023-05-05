@@ -16,10 +16,8 @@ var chatgptController *chatgpt.ChatgptController
 func RegisterFactory() {
 
 	var aiProvider = ai.NewOpenAiProvider()
-
-	var messageHandler = handler.NewMessageHandler(aiProvider)
-
 	var textToSpeech = aws.NewPolly()
+	var messageHandler = handler.NewMessageHandler(aiProvider, textToSpeech)
 
 	var appService = services.NewAppService(aiProvider, messageHandler)
 	var lineService = services.NewLineService(aiProvider, messageHandler, textToSpeech)
