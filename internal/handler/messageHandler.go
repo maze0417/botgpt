@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/sashabaranov/go-openai"
 	"log"
 	"strings"
 )
@@ -18,6 +19,30 @@ import (
 type MessageHandler struct {
 	aiProvider   interfaces.IAiProvider
 	textToSpeech interfaces.ITextToSpeech
+}
+
+func (m MessageHandler) SendStream(messageFrom string, userID string) (error, *openai.ChatCompletionStream) {
+
+	msg := gpt3.Message{
+		Role:    gpt3.User,
+		Content: messageFrom,
+	}
+
+	var totalMessages []gpt3.Message
+
+	err, totalMessages := getSetTotalMessages(userID, msg, 5)
+	if err != nil {
+		totalMessages = append(totalMessages, msg)
+	}
+
+	err, resp := m.aiProvider.GenerateTextStream(totalMessages, userID)
+
+	if err != nil {
+		return err, nil
+	}
+
+	return nil, resp
+
 }
 
 func NewMessageHandler(apiProvider interfaces.IAiProvider, textToSpeech interfaces.ITextToSpeech) interfaces.IMessageHandler {

@@ -24,6 +24,11 @@ func NewRouter() *gin.Engine {
 
 	v1.GET("/status", statusController.Status)
 
+	chat := v1.Group("/chat")
+	{
+		chat.POST("/completions", chatController.CompleteChat)
+	}
+
 	webhook := v1.Group("/webhook")
 	{
 		webhook.POST("/line", webHookController.LineMessage)

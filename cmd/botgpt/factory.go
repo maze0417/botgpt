@@ -12,6 +12,7 @@ import (
 var statusController *controllers.StatusController
 var webHookController *controllers.WebHookController
 var chatgptController *chatgpt.ChatgptController
+var chatController *controllers.ChatController
 
 func RegisterFactory() {
 
@@ -22,8 +23,10 @@ func RegisterFactory() {
 	var appService = services.NewAppService(aiProvider, messageHandler)
 	var lineService = services.NewLineService(aiProvider, messageHandler, textToSpeech)
 	var telegramService = services.NewTelegramService(aiProvider, messageHandler, textToSpeech)
+	var webchat = services.NewChatService(aiProvider, messageHandler)
 
 	statusController = controllers.NewStatusController()
 	webHookController = controllers.NewWebHookController(telegramService, lineService, appService)
 	chatgptController = chatgpt.NewChatgptController()
+	chatController = controllers.NewChatController(webchat)
 }

@@ -4,11 +4,24 @@ import (
 	"botgpt/internal/clients/gpt3"
 	"botgpt/internal/interfaces"
 	"botgpt/internal/utils"
+	"github.com/sashabaranov/go-openai"
 
 	"log"
 )
 
 type OpenAiProvider struct {
+}
+
+func (a OpenAiProvider) GenerateTextStream(totalMessages []gpt3.Message, userID string) (error, *openai.ChatCompletionStream) {
+	log.Printf("send gpt with %v :: \n %s \n\n", userID, utils.Json(totalMessages, true))
+
+	err, resp := gpt3.CreateChatCompletionStream(totalMessages, userID)
+
+	if err != nil {
+		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, err)
+		return err, resp
+	}
+	return err, resp
 }
 
 func (a OpenAiProvider) Transcribe(filePath string) (string, error) {

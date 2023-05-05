@@ -43,8 +43,8 @@ func (l AppService) HandleText(message *models.Message) {
 	redisKey := fmt.Sprintf("%s:%s", userID, sendMessage)
 
 	resp, err := redisManager.GetAndCache(redisKey, func() (interface{}, error) {
-		resp, err := l.messageHandler.Send(sendMessage, false, userID, groupID, "")
-		return err, resp
+		err, resp := l.messageHandler.Send(sendMessage, false, userID, groupID, "")
+		return resp, err
 	})
 
 	switch err := err.(type) {

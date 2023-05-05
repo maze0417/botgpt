@@ -54,6 +54,7 @@ func (h WebHookController) ClientMessage(c *gin.Context) {
 	res := <-message.ContextChan
 	utils.SendResponse(http.StatusOK, response.OKHasContent(res), c)
 }
+
 func (h WebHookController) LineMessage(c *gin.Context) {
 	events, err := line.ParseRequest(c.Request)
 	if err != nil {
