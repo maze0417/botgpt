@@ -238,7 +238,10 @@ func ShowHelp(fromID string) (string, error) {
 
 	var builder strings.Builder
 
-	builder.WriteString(fmt.Sprintf("Your Group or User ID: %s \n", fromID))
+	builder.WriteString(fmt.Sprintf("Web Version: %s \n", "https://webgpt.sogaprod.club"))
+	builder.WriteRune('\n')
+
+	builder.WriteString(fmt.Sprintf("Chat Id: %s \n", fromID))
 	builder.WriteRune('\n')
 
 	mode := DefaultMode
