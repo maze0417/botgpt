@@ -118,12 +118,11 @@ func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		totalMessages = append(totalMessages, msg)
 	}
 
+	totalMessages = insertSystemMessage(sysMsg, totalMessages)
+
 	if !command.HaveHistoryMessage() {
 		totalMessages = []gpt3.Message{msg}
 	}
-
-	totalMessages = insertSystemMessage(sysMsg, totalMessages)
-
 	err, resp := m.aiProvider.GenerateText(totalMessages, userID)
 
 	if err != nil {
