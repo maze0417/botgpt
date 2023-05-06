@@ -3,6 +3,7 @@ package aws
 import (
 	"botgpt/internal/enum"
 	"botgpt/internal/interfaces"
+	"fmt"
 	"github.com/pemistahl/lingua-go"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -39,6 +40,15 @@ func getPollyClient() *polly.Polly {
 		if err != nil {
 			panic(err)
 		}
+		creds := sess.Config.Credentials
+		awsCreds, err := creds.Get()
+
+		if err != nil {
+			fmt.Println("Error getting AWS credentials:", err)
+			panic(err)
+		}
+
+		fmt.Printf("AWS credentials: %+v \n", awsCreds)
 
 		// Create a Polly client
 		pollyClient = polly.New(sess)
