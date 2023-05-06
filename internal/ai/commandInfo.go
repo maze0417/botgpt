@@ -128,7 +128,7 @@ var (
 			TgParserMode:       telegram.MarkdownV2,
 			Usage:              "/ct@mazeaibot {message} => ai baby",
 			MaxHistoryLen:      3,
-			PromptPrefixInject: "你現在扮演一個提問者,只會詢問是非題，根據以下描述發問吧\n",
+			PromptPrefixInject: "你現在扮演一個提問者,只會詢問是非題，例如: 對於要不要出去玩有點困惑 提問則為: 你想要出去玩嗎？ \n",
 			Alias:              []string{"/asker", "/ask"},
 		},
 	}
