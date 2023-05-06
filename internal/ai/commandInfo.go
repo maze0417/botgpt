@@ -126,9 +126,9 @@ var (
 			SystemPrompt:       "",
 			PostExec:           nil,
 			TgParserMode:       telegram.MarkdownV2,
-			Usage:              "/ct@mazeaibot {message} => ai baby",
+			Usage:              "/asker@mazeaibot 用是非題詢問",
 			MaxHistoryLen:      0,
-			PromptPrefixInject: "你現在扮演一個提問者,只會詢問是非題，例如: 對於要不要出去玩有點困惑 提問則為: 你想要出去玩嗎？ \n",
+			PromptPrefixInject: "請你用是非題問我: \n",
 			Alias:              []string{"/asker", "/ask"},
 		},
 	}

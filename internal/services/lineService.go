@@ -57,6 +57,7 @@ func (l LineService) HandleText(events []*linebot.Event) {
 				isGroup := event.Source.Type == "group"
 
 				userID := fmt.Sprintf("line:%s", event.Source.UserID)
+
 				groupID := event.Source.UserID
 				if isGroup {
 					userID = fmt.Sprintf("%s:%s", userID, event.Source.GroupID)
@@ -142,8 +143,15 @@ func (l *LineService) handleAudioMessage(bot *linebot.Client, event *linebot.Eve
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf("語音轉文字結果(Transcriptions result): \n%s", text))
 
+	isGroup := event.Source.Type == "group"
+
 	userID := fmt.Sprintf("line:%s", event.Source.UserID)
+
 	groupID := event.Source.UserID
+	if isGroup {
+		userID = fmt.Sprintf("%s:%s", userID, event.Source.GroupID)
+		groupID = event.Source.GroupID
+	}
 
 	err, gptResponse := l.messageHandler.Send(text, false, userID, groupID, "")
 	builder.WriteString("\n\nGPT：\n")
