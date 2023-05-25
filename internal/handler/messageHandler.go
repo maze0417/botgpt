@@ -158,7 +158,7 @@ func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 		IsText:      true,
 		Text:        replyToClientMsg,
 		TgParseMode: command.TgParserMode,
-		CommandMode: command.Usage,
+		CommandMode: command.Cmd,
 		Lang:        command.Lang,
 	}
 }

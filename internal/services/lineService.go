@@ -1,6 +1,7 @@
 package services
 
 import (
+	"botgpt/internal/ai"
 	"botgpt/internal/clients/aws"
 	"botgpt/internal/clients/line"
 	"botgpt/internal/interfaces"
@@ -64,7 +65,7 @@ func (l LineService) HandleText(events []*linebot.Event) {
 					groupID = event.Source.GroupID
 				}
 
-				err, gptRes := l.messageHandler.Send(message.Text, isGroup, userID, groupID, "")
+				err, gptResponse := l.messageHandler.Send(message.Text, isGroup, userID, groupID, "")
 
 				switch err := err.(type) {
 				case nil:
@@ -79,21 +80,60 @@ func (l LineService) HandleText(events []*linebot.Event) {
 					continue
 				}
 
-				if gptRes.IsImage {
-					if _, err = line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewImageMessage(gptRes.Text, gptRes.Text)).Do(); err != nil {
-						log.Printf("%s reply error %s ", gptRes.Text, err)
+				if gptResponse.IsImage {
+					if _, err = line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewImageMessage(gptResponse.Text, gptResponse.Text)).Do(); err != nil {
+						log.Printf("%s reply error %s ", gptResponse.Text, err)
 						continue
 					}
 
 				}
 
-				if gptRes.IsText {
-					if _, err = line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage(gptRes.Text)).Do(); err != nil {
-						log.Printf("%s reply error %s ", gptRes.Text, err)
+				if gptResponse.IsText {
+					if _, err = line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage(gptResponse.Text)).Do(); err != nil {
+						log.Printf("%s reply error %s ", gptResponse.Text, err)
 
 						continue
 					}
 
+				}
+
+				if gptResponse.CommandMode == ai.Asker {
+
+					var builder strings.Builder
+					lang := l.textToSpeech.GetLangFromText(gptResponse.Text)
+					if len(lang) == 0 {
+						lang = gptResponse.Text
+					}
+
+					outputFile := fmt.Sprintf("%s%s.%s", utils.GetUploadDir(), uuid.New().String(), polly.OutputFormatMp3)
+					log.Printf("try convert text to voice %s \n", outputFile)
+
+					err, data := l.textToSpeech.TextToSpeech(gptResponse.Text, outputFile, polly.OutputFormatMp3, lang)
+					if err != nil {
+						builder.WriteString(err.Error())
+						log.Error(err)
+						line.CreateLineClient().ReplyMessage(event.ReplyToken, linebot.NewTextMessage(builder.String())).Do()
+						return
+					}
+					defer os.Remove(outputFile)
+					s3Client := aws.NewS3()
+					duration := 3000 // 語音檔案的播放持續時間，單位為毫秒
+
+					audioFileURL, err := s3Client.Upload(outputFile, data)
+					if err != nil {
+						log.Println("無法上傳到S3:", err)
+						return
+					}
+
+					_, err = line.CreateLineClient().ReplyMessage(
+						event.ReplyToken,
+						linebot.NewTextMessage(builder.String()),
+						linebot.NewAudioMessage(audioFileURL, duration),
+					).Do()
+
+					if err != nil {
+						log.Println("無法發送語音檔案:", err)
+					}
 				}
 
 			}

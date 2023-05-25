@@ -129,7 +129,7 @@ var (
 			Usage:              "/asker@mazeaibot 用是非題詢問",
 			MaxHistoryLen:      0,
 			PromptPrefixInject: "請你用是非題問我: \n",
-			Alias:              []string{"/asker", "/ask"},
+			Alias:              []string{"/asker", "/ask", "@ask"},
 		},
 	}
 )
