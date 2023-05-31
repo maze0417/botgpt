@@ -83,7 +83,8 @@ func (t TelegramService) HandleText(update tgbotapi.Update) (*models.AiResponse,
 
 	_ = telegram.SendBotAction(update.Message.Chat.ID, tgbotapi.ChatTyping)
 
-	err, gptResponse := t.messageHandler.Send(messageFrom, update.Message.Chat.IsGroup(), userID, groupID, messageReply)
+	isGroup := update.Message.Chat.IsGroup() || update.Message.Chat.Type == "supergroup"
+	err, gptResponse := t.messageHandler.Send(messageFrom, isGroup, userID, groupID, messageReply)
 
 	switch err := err.(type) {
 	case nil:
