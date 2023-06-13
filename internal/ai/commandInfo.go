@@ -90,7 +90,7 @@ var (
 			//TgParserMode:  tgbotapi.ModeHTML,
 			Usage:         "/image generate image by dall-e",
 			MaxHistoryLen: 0,
-			Alias:         []string{"@botimg", "draw", "畫", "/image"},
+			Alias:         []string{"@botimg", "draw", "畫", "/image", "＠botimg"},
 		},
 		Chat: {
 			Cmd:           Chat,
@@ -99,7 +99,7 @@ var (
 			TgParserMode:  telegram.MarkdownV2,
 			Usage:         "/chat {message}",
 			MaxHistoryLen: 3,
-			Alias:         []string{"@bot", "@mazeaibot", "/chat"},
+			Alias:         []string{"@bot", "@mazeaibot", "/chat", "＠bot", "＠mazeaibot"},
 		},
 		CreateAzureWorkItem: {
 			Cmd:           CreateAzureWorkItem,
