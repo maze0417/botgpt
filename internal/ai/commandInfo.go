@@ -46,6 +46,15 @@ const (
 
 var (
 	CommandMap = map[string]CommandInfo{
+		Chat: {
+			Cmd:           Chat,
+			SystemPrompt:  UseGroupDefaultSysMsg, //use group as default
+			PostExec:      nil,
+			TgParserMode:  telegram.MarkdownV2,
+			Usage:         "/chat {message}",
+			MaxHistoryLen: 3,
+			Alias:         []string{"@bot", "@mazeaibot", "/chat", "＠bot", "＠mazeaibot"},
+		},
 		Help: {
 			Cmd:           Help,
 			SystemPrompt:  "",
@@ -92,15 +101,7 @@ var (
 			MaxHistoryLen: 0,
 			Alias:         []string{"@botimg", "draw", "畫", "/image", "＠botimg"},
 		},
-		Chat: {
-			Cmd:           Chat,
-			SystemPrompt:  UseGroupDefaultSysMsg, //use group as default
-			PostExec:      nil,
-			TgParserMode:  telegram.MarkdownV2,
-			Usage:         "/chat {message}",
-			MaxHistoryLen: 3,
-			Alias:         []string{"@bot", "@mazeaibot", "/chat", "＠bot", "＠mazeaibot"},
-		},
+
 		CreateAzureWorkItem: {
 			Cmd:           CreateAzureWorkItem,
 			SystemPrompt:  "幫忙把把對話裡面的關於`標題` 跟 `內容`轉化成 json , 範例:幫我建立一張azure workitem 標題是`MyHeader` 內容是`Mycontent` 只需要輸出JSON 不需要其他內容: `[{\"op\": \"add\",\"path\": \"/fields/System.Title\",\"value\": \"MyHeader\"},{\"op\": \"add\",\"path\": \"/fields/System.Description\",\"value\": \"Mycontent\"}]` ",
