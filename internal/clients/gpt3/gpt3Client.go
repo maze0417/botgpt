@@ -2,6 +2,7 @@ package gpt3
 
 import (
 	"botgpt/internal/config"
+	"botgpt/internal/utils"
 	"context"
 	"github.com/sashabaranov/go-openai"
 	log "github.com/sirupsen/logrus"
@@ -34,7 +35,7 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 
 	ctx := context.Background()
 
-	resp, err := createGp3Client().CreateChatCompletion(ctx, openai.ChatCompletionRequest{
+	request := openai.ChatCompletionRequest{
 		Model:            gpt4,
 		Messages:         convertToChatCompletionMessages(totalMessages),
 		MaxTokens:        512,
@@ -42,7 +43,10 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 		FrequencyPenalty: 0,
 		Stream:           false,
 		User:             userID,
-	})
+	}
+	log.Printf("request to gpt :: %v :: \n %s \n\n", userID, utils.Json(request, true))
+
+	resp, err := createGp3Client().CreateChatCompletion(ctx, request)
 
 	if err != nil {
 		log.Errorln(err)

@@ -45,7 +45,7 @@ func (a OpenAiProvider) GenerateImage(message string, userID string) (string, er
 }
 
 func (a OpenAiProvider) GenerateText(totalMessages []gpt3.Message, userID string) (error, string) {
-	log.Printf("send gpt with %v :: \n %s \n\n", userID, utils.Json(totalMessages, true))
+	//log.Printf("send gpt with %v :: \n %s \n\n", userID, utils.Json(totalMessages, true))
 
 	err, resp := gpt3.CompletionGpt(totalMessages, userID)
 
