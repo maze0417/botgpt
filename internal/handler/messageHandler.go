@@ -109,7 +109,13 @@ func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 			Lang:        command.Lang,
 		}
 	}
+
 	sysMsg := m.getSystemPromptFromMessage(message, command)
+
+	group := ai.GetGroupMode(groupID)
+	if group != nil && group.Enable && len(group.SystemMessage) > 0 {
+		sysMsg = group.SystemMessage
+	}
 	msg := m.getPromptFromMessage(message, command)
 
 	var totalMessages []gpt3.Message
