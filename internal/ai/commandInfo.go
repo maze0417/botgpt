@@ -205,11 +205,14 @@ func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandI
 }
 func ReplaceCommandAsEmpty(msg string) string {
 
-	for k := range CommandMap {
-		if strings.HasPrefix(msg, k) {
-			msg = strings.Replace(msg, fmt.Sprintf("%s ", k), "", 1)
-			return msg
+	for k, v := range CommandMap {
+		for _, alias := range v.Alias {
+			if strings.HasPrefix(msg, alias) {
+				msg = strings.Replace(msg, fmt.Sprintf("%s ", k), "", 1)
+				return msg
+			}
 		}
+
 	}
 
 	return msg
