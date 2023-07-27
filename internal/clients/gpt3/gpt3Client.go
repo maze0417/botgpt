@@ -38,7 +38,7 @@ func CompletionGpt(totalMessages []Message, userID string) (error, string) {
 	request := openai.ChatCompletionRequest{
 		Model:            gpt4,
 		Messages:         convertToChatCompletionMessages(totalMessages),
-		MaxTokens:        512,
+		MaxTokens:        1024,
 		PresencePenalty:  0,
 		FrequencyPenalty: 0,
 		Stream:           false,
