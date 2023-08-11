@@ -72,8 +72,8 @@ type Fields struct {
 }
 
 type FieldChange struct {
-	OldValue string `json:"oldValue"`
-	NewValue string `json:"newValue"`
+	OldValue interface{} `json:"oldValue"`
+	NewValue interface{} `json:"newValue"`
 }
 
 type Revision struct {
