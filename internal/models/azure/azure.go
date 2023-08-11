@@ -84,19 +84,19 @@ type Revision struct {
 }
 
 type RevisionFields struct {
-	SystemAreaPath                                  string    `json:"System.AreaPath"`
-	SystemTeamProject                               string    `json:"System.TeamProject"`
-	SystemIterationPath                             string    `json:"System.IterationPath"`
-	SystemWorkItemType                              string    `json:"System.WorkItemType"`
-	SystemState                                     string    `json:"System.State"`
-	SystemReason                                    string    `json:"System.Reason"`
-	SystemCreatedDate                               string    `json:"System.CreatedDate"`
-	SystemCreatedBy                                 RevisedBy `json:"System.CreatedBy"`
-	SystemChangedDate                               string    `json:"System.ChangedDate"`
-	SystemChangedBy                                 RevisedBy `json:"System.ChangedBy"`
-	SystemTitle                                     string    `json:"System.Title"`
-	MicrosoftVSTSCommonSeverity                     string    `json:"Microsoft.VSTS.Common.Severity"`
-	WEFEB329F44FE5F4A94ACB1DA153FDF38BAKanbanColumn string    `json:"WEF_EB329F44FE5F4A94ACB1DA153FDF38BA_Kanban.Column"`
+	SystemAreaPath                                  string      `json:"System.AreaPath"`
+	SystemTeamProject                               string      `json:"System.TeamProject"`
+	SystemIterationPath                             string      `json:"System.IterationPath"`
+	SystemWorkItemType                              string      `json:"System.WorkItemType"`
+	SystemState                                     string      `json:"System.State"`
+	SystemReason                                    string      `json:"System.Reason"`
+	SystemCreatedDate                               string      `json:"System.CreatedDate"`
+	SystemCreatedBy                                 interface{} `json:"System.CreatedBy"`
+	SystemChangedDate                               string      `json:"System.ChangedDate"`
+	SystemChangedBy                                 interface{} `json:"System.ChangedBy"`
+	SystemTitle                                     string      `json:"System.Title"`
+	MicrosoftVSTSCommonSeverity                     string      `json:"Microsoft.VSTS.Common.Severity"`
+	WEFEB329F44FE5F4A94ACB1DA153FDF38BAKanbanColumn string      `json:"WEF_EB329F44FE5F4A94ACB1DA153FDF38BA_Kanban.Column"`
 }
 
 type ResourceContainers struct {
