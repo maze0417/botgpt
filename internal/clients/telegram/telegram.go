@@ -126,3 +126,15 @@ func UpdateMessage(chatID int64, msg string, editMessageID int) error {
 	}
 	return nil
 }
+
+func SendMessage(chatID int64, msg string) (*tgbotapi.Message, error) {
+
+	newMsg := tgbotapi.NewMessage(chatID, msg)
+
+	res, err := CreateOrGetTgClient().Send(newMsg)
+	if err != nil {
+		log.Errorf("Send telegram message error:: %v \n", err)
+		return nil, err
+	}
+	return &res, nil
+}

@@ -3,11 +3,15 @@ package controllers
 import (
 	"botgpt/internal/ai"
 	"botgpt/internal/clients/line"
+	"botgpt/internal/clients/telegram"
 	"botgpt/internal/enum"
 	"botgpt/internal/interfaces"
 	"botgpt/internal/models"
+	"botgpt/internal/models/azure"
 	"botgpt/internal/utils"
 	"botgpt/internal/utils/response"
+	"strconv"
+	"strings"
 
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -117,4 +121,32 @@ func (h WebHookController) UpdateGroup(c *gin.Context) {
 	result := response.OKHasContent(resp)
 
 	utils.SendResponse(http.StatusOK, result, c)
+}
+
+func (h WebHookController) AzureNotification(c *gin.Context) {
+
+	var notification azure.Notification
+	err := c.BindJSON(&notification)
+	if err != nil {
+
+		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
+		return
+	}
+	chatID, _ := strconv.Atoi(ai.TelegramGroupGpt3Turbo)
+	_ = telegram.SendBotAction(int64(chatID), tgbotapi.ChatTyping)
+
+	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("%s \n", notification.DetailedMessage.Text))
+
+	// 使用 Builder 的 String 方法將其內容轉換為字符串
+	result := builder.String()
+	_, err = telegram.SendMessage(int64(chatID), result)
+
+	if err != nil {
+
+		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
+		return
+	}
+
+	utils.SendResponse(http.StatusOK, response.OKHasContent(notification), c)
 }

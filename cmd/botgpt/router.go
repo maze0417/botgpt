@@ -34,6 +34,7 @@ func NewRouter() *gin.Engine {
 		webhook.POST("/line", webHookController.LineMessage)
 		webhook.POST("/tg", webHookController.TgMessage)
 		webhook.POST("/client", webHookController.ClientMessage)
+		webhook.POST("/azure", webHookController.AzureNotification)
 
 		webhook.POST("/update/prompt", webHookController.UpdatePrompt)
 		webhook.POST("/update/group", webHookController.UpdateGroup)
