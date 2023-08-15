@@ -132,6 +132,19 @@ func (h WebHookController) AzureNotification(c *gin.Context) {
 		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
 		return
 	}
+
+	statuses := []string{"Done", "Closed"}
+	strValue, ok := notification.Resource.Fields.SystemState.NewValue.(string)
+
+	if !ok {
+		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse state value : %v", notification.Resource.Fields.SystemState.NewValue), enum.FALIURE), c)
+		return
+	}
+	if !utils.Contains(statuses, strValue) {
+		utils.SendResponse(http.StatusOK, response.OKHasContent("status is not valid"), c)
+		return
+	}
+
 	chatID, _ := strconv.Atoi(ai.CsUpdated)
 	_ = telegram.SendBotAction(int64(chatID), tgbotapi.ChatTyping)
 
