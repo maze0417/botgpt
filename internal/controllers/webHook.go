@@ -132,7 +132,7 @@ func (h WebHookController) AzureNotification(c *gin.Context) {
 		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
 		return
 	}
-	chatID, _ := strconv.Atoi(ai.PrivateTestBot)
+	chatID, _ := strconv.Atoi(ai.CsUpdated)
 	_ = telegram.SendBotAction(int64(chatID), tgbotapi.ChatTyping)
 
 	var builder strings.Builder

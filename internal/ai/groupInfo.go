@@ -13,6 +13,7 @@ const (
 	PrivateTestBot         = "1066396636"
 	PhTgProject            = "-728297760"
 	LineCard               = "Cd893d1f8eb0e28de1a4b06a0237bdbb2"
+	CsUpdated              = "-859160990"
 )
 
 var GroupMapping = map[string]GroupSetting{
