@@ -133,7 +133,7 @@ func (h WebHookController) AzureNotification(c *gin.Context) {
 		return
 	}
 
-	statuses := []string{"InProd", "Closed"}
+	statuses := []string{"Resolved", "Closed"}
 	strValue, ok := notification.Resource.Fields.SystemState.NewValue.(string)
 
 	if !ok {
