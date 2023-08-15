@@ -18,6 +18,8 @@ func NewRouter() *gin.Engine {
 
 	telegram.CreateOrGetTgClient()
 
+	router.Static("/static", "./static")
+
 	v1 := router.Group("/api/v1")
 	v1.Use(middleware.HttpLoggerMiddleware)
 	v1.Use(middleware.ExceptionMiddleware)
