@@ -130,7 +130,13 @@ func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 	if !command.HaveHistoryMessage() {
 		totalMessages = []gpt3.Message{msg}
 	}
-	err, resp := m.aiProvider.GenerateText(totalMessages, userID)
+	llmModel := openai.GPT3Dot5Turbo
+
+	if len(group.LLMModel) > 0 {
+		llmModel = group.LLMModel
+	}
+
+	err, resp := m.aiProvider.GenerateText(totalMessages, userID, llmModel)
 
 	if err != nil {
 		return err, nil

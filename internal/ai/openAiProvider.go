@@ -44,10 +44,10 @@ func (a OpenAiProvider) GenerateImage(message string, userID string) (string, er
 	return resp, err
 }
 
-func (a OpenAiProvider) GenerateText(totalMessages []gpt3.Message, userID string) (error, string) {
+func (a OpenAiProvider) GenerateText(totalMessages []gpt3.Message, userID string, model string) (error, string) {
 	//log.Printf("send gpt with %v :: \n %s \n\n", userID, utils.Json(totalMessages, true))
-
-	err, resp := gpt3.CompletionGpt(totalMessages, userID)
+	
+	err, resp := gpt3.CompletionGpt(totalMessages, userID, model)
 
 	if err != nil {
 		log.Printf("send %v to gpt got error message :: %s  \n \n ", userID, err)

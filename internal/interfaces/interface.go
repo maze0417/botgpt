@@ -8,7 +8,7 @@ import (
 
 type IAiProvider interface {
 	GenerateImage(message string, userID string) (string, error)
-	GenerateText(totalMessages []gpt3.Message, userID string) (error, string)
+	GenerateText(totalMessages []gpt3.Message, userID string, model string) (error, string)
 	GenerateTextStream(totalMessages []gpt3.Message, userID string) (error, *openai.ChatCompletionStream)
 	Transcribe(filePath string) (string, error)
 }

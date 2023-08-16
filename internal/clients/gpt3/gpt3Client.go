@@ -31,12 +31,12 @@ func createGp3Client() *openai.Client {
 	return myOpenAI
 }
 
-func CompletionGpt(totalMessages []Message, userID string) (error, string) {
+func CompletionGpt(totalMessages []Message, userID string, model string) (error, string) {
 
 	ctx := context.Background()
 
 	request := openai.ChatCompletionRequest{
-		Model:            gpt4,
+		Model:            model,
 		Messages:         convertToChatCompletionMessages(totalMessages),
 		MaxTokens:        1024,
 		PresencePenalty:  0,
