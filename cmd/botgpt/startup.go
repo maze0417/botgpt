@@ -3,7 +3,6 @@ package botgpt
 import (
 	"botgpt/internal/config"
 	"botgpt/internal/utils"
-	"botgpt/migration"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -11,7 +10,7 @@ import (
 
 func Run() {
 
-	migration.Migrate()
+	//migration.Migrate()
 
 	env := config.GetConfig()
 

@@ -163,3 +163,39 @@ func (h WebHookController) AzureNotification(c *gin.Context) {
 
 	utils.SendResponse(http.StatusOK, response.OKHasContent(notification), c)
 }
+
+func (h WebHookController) SendToTelegram(c *gin.Context) {
+
+	var message models.SendTgRequest
+	err := c.BindJSON(&message)
+	if err != nil {
+
+		utils.SendResponse(http.StatusBadRequest, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
+		return
+	}
+	if len(message.Text) == 0 {
+		utils.SendResponse(http.StatusOK, response.OKHasContent("no message"), c)
+		return
+	}
+	if len(message.ChatID) == 0 {
+		utils.SendResponse(http.StatusOK, response.OKHasContent("no chat id"), c)
+		return
+	}
+	chatID, _ := strconv.Atoi(message.ChatID)
+	_ = telegram.SendBotAction(int64(chatID), tgbotapi.ChatTyping)
+
+	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("%s \n", message.Text))
+
+	// 使用 Builder 的 String 方法將其內容轉換為字符串
+	result := builder.String()
+	res, err := telegram.SendMessage(int64(chatID), result)
+
+	if err != nil {
+
+		utils.SendResponse(http.StatusOK, response.Failure(fmt.Sprintf("Error parse request body : %v", err), enum.FALIURE), c)
+		return
+	}
+
+	utils.SendResponse(http.StatusOK, response.OKHasContent(res), c)
+}

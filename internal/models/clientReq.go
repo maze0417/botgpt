@@ -17,3 +17,8 @@ type ChatMessage struct {
 	ChatRequestMessage openai.ChatCompletionRequest
 	Context            *gin.Context `json:"-"`
 }
+
+type SendTgRequest struct {
+	Text   string `json:"text"`
+	ChatID string `json:"chat_id"`
+}
