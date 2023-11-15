@@ -1,7 +1,5 @@
 package ai
 
-import "github.com/sashabaranov/go-openai"
-
 type GroupSetting struct {
 	SystemMessage string
 	CommandMode   string
@@ -17,6 +15,9 @@ const (
 	PhTgProject            = "-728297760"
 	LineCard               = "Cd893d1f8eb0e28de1a4b06a0237bdbb2"
 	CsUpdated              = "-1001829478512"
+
+	GPTLatestModel  = "gpt-4-vision-preview"
+	GPTCheaperModel = "gpt-3.5-turbo-1106"
 )
 
 var GroupMapping = map[string]GroupSetting{
@@ -31,7 +32,7 @@ var GroupMapping = map[string]GroupSetting{
 	TelegramGroupGpt3Turbo: {
 		CommandMode: Chat,
 		Enable:      false,
-		LLMModel:    openai.GPT4,
+		LLMModel:    GPTLatestModel,
 	},
 	PhTgProject: {
 		CommandMode: EnToTw,
@@ -41,7 +42,7 @@ var GroupMapping = map[string]GroupSetting{
 		SystemMessage: "作為一個專業塔羅牌大師，具有廣泛的知識，包括所有78張塔羅牌的含義以及各種不同的塔羅牌展開方式。你可以幫助用戶進行塔羅牌抽牌以及讀牌，並解釋每張牌的象徵意義和可能的解讀。你的目標是提供專業，深入和有洞察力的塔羅牌解讀，並且溫馨提醒該注意的事情，以幫助用戶理解他們的問題和情況",
 		CommandMode:   Chat,
 		Enable:        true,
-		LLMModel:      openai.GPT4,
+		LLMModel:      GPTLatestModel,
 	},
 }
 

@@ -16,7 +16,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/pemistahl/lingua-go v1.3.3
 	github.com/redis/go-redis/v9 v9.0.2
-	github.com/sashabaranov/go-openai v1.7.0
+	github.com/sashabaranov/go-openai v1.17.6
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1

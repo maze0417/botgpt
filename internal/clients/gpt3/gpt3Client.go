@@ -90,9 +90,11 @@ func GenerateImageGpt(message string) (string, error) {
 	ctx := context.Background()
 
 	resp, err := createGp3Client().CreateImage(ctx, openai.ImageRequest{
-		Prompt: message,
-		N:      1,
-		Size:   "512x512",
+		Prompt:  message,
+		N:       1,
+		Size:    "1024x1024",
+		Quality: "standard",
+		Model:   openai.CreateImageModelDallE3,
 	})
 
 	if err != nil {

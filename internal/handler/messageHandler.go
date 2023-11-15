@@ -112,7 +112,7 @@ func (m MessageHandler) Send(messageFrom string, isGroup bool, userID string, gr
 
 	sysMsg := m.getSystemPromptFromMessage(message, command)
 
-	llmModel := openai.GPT3Dot5Turbo
+	llmModel := ai.GPTCheaperModel
 
 	group := ai.GetGroupMode(groupID)
 	if group != nil && group.Enable && len(group.SystemMessage) > 0 {
