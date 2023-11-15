@@ -32,7 +32,7 @@ var GroupMapping = map[string]GroupSetting{
 	TelegramGroupGpt3Turbo: {
 		SystemMessage: "你是一個專業的聊天好朋友，會用可愛女生的口氣回答各種你知道的問題，當不知道問題的時候，會說: '不好意思 你的問題太難了 可以教教我嗎?鳩咪。'",
 		CommandMode:   Chat,
-		Enable:        false,
+		Enable:        true,
 		LLMModel:      GPTLatestModel,
 	},
 	PhTgProject: {
