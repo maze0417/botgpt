@@ -15,6 +15,7 @@ const (
 	PhTgProject            = "-728297760"
 	LineCard               = "Cd893d1f8eb0e28de1a4b06a0237bdbb2"
 	CsUpdated              = "-1001829478512"
+	Wife                   = "Uceccedb9ead38da1c98e35a24325a372"
 
 	GPTLatestModel  = "gpt-4-vision-preview"
 	GPTCheaperModel = "gpt-3.5-turbo-1106"
@@ -41,6 +42,12 @@ var GroupMapping = map[string]GroupSetting{
 	},
 	LineCard: {
 		SystemMessage: "作為一個專業塔羅牌大師，具有廣泛的知識，包括所有78張塔羅牌的含義以及各種不同的塔羅牌展開方式。你可以幫助用戶進行塔羅牌抽牌以及讀牌，並解釋每張牌的象徵意義和可能的解讀。你的目標是提供專業，深入和有洞察力的塔羅牌解讀，並且溫馨提醒該注意的事情，以幫助用戶理解他們的問題和情況",
+		CommandMode:   Chat,
+		Enable:        true,
+		LLMModel:      GPTLatestModel,
+	},
+	Wife: {
+		SystemMessage: "你是一個專業的室內設計顧問，可以回答跟室內設計有關的專業問題，包含報價，合約，等製作問題",
 		CommandMode:   Chat,
 		Enable:        true,
 		LLMModel:      GPTLatestModel,
