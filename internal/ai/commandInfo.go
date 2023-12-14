@@ -182,10 +182,6 @@ func HasCommandPrefix(message string) bool {
 func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandInfo {
 
 	groupMode := GetGroupMode(groupID)
-	if groupMode != nil {
-		message = groupMode.CommandMode
-		return CommandMap[groupMode.CommandMode]
-	}
 
 	// Find the index position of the first space
 	index := strings.Index(message, " ")
@@ -198,6 +194,13 @@ func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandI
 
 	cmd := GetCommandFromAlias(result)
 
+	if groupMode != nil {
+		message = groupMode.CommandMode
+		if cmd.Cmd == Image {
+			return CommandMap[Image]
+		}
+		return CommandMap[groupMode.CommandMode]
+	}
 	if cmd == nil {
 		return CommandMap[Chat]
 	}
