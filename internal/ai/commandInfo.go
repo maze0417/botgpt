@@ -196,7 +196,8 @@ func GetGroupModeOrCommandInfoByMessage(message string, groupID string) CommandI
 
 	if groupMode != nil {
 		message = groupMode.CommandMode
-		if cmd.Cmd == Image {
+
+		if cmd != nil && cmd.Cmd == Image {
 			return CommandMap[Image]
 		}
 		return CommandMap[groupMode.CommandMode]
